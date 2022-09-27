@@ -1,8 +1,8 @@
 import { Game } from "./game.js";
-import { HumanCar } from "./humanCar.js";
+import { HumanInput } from "./humanInput.js";
 
 export function initializeGame(inputType) {
     if (inputType === "human") {
-        return new Game(new HumanCar(document));
+        return new Game(new HumanInput(document));
     }
 }

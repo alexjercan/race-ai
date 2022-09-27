@@ -1,12 +1,12 @@
 export class Game {
-    constructor(car) {
-        this.car = car;
+    constructor(input) {
+        this.input = input;
 
-        // Generate the track and obstacles
+        // Generate the car track and obstacles
     }
 
     update(deltaTime) {
-        const input = this.car.waitInput();
+        const input = this.input.waitInput();
 
         console.log(input);
     }

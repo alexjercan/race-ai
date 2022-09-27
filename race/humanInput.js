@@ -5,7 +5,7 @@ const defaultKeymap = {
     "d": [0, 1],
 };
 
-export class HumanCar {
+export class HumanInput {
     constructor(document, keyMap = defaultKeymap) {
         this.map = {};
         this.keyMap = keyMap;

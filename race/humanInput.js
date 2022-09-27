@@ -9,6 +9,7 @@ export class HumanInput {
     constructor(document, keyMap = defaultKeymap) {
         this.map = {};
         this.keyMap = keyMap;
+        this.input = [0, 0];
 
         document.addEventListener("keydown", (event) => {
             this.map[event.key] = true;

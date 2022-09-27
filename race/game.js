@@ -1,19 +1,24 @@
+import { Car } from "./car.js"
+
 export class Game {
     constructor(input) {
         this.input = input;
+        this.speed = 50;
+        this.turnSpeed = Math.PI / 2;
 
-        // Generate the car track and obstacles
+        this.player = new Car([100, 50], 0);
     }
 
     update(deltaTime) {
         const input = this.input.waitInput();
 
-        console.log(input);
+        const velocity = input[0] * deltaTime * this.speed;
+        const angle = input[1] * deltaTime * this.turnSpeed;
+
+        this.player.move(velocity, angle);
     }
 
     draw(context) {
-        context.fillStyle = Math.random() > 0.5 ? '#ff8080' : '#0099b0';
-
-        context.fillRect(100, 50, 200, 175);
+        this.player.draw(context);
     }
 }

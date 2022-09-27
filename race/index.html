@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>RaceAI</title>
+</head>
+
+<body>
+    <canvas id="canvas" width="750" height="400" style="border:1px solid lightgrey;"></canvas>
+
+    <script type="module">
+        "use strict";
+        import { initializeGame } from "./index.js";
+
+        let context;
+        let oldTimeStamp;
+        let game;
+
+        window.onload = init;
+
+        function init() {
+            const canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+            game = initializeGame("human");
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+        function gameLoop(timeStamp) {
+            const deltaTime = (timeStamp - oldTimeStamp) / 1000;
+            oldTimeStamp = timeStamp;
+
+            const fps = Math.round(1 / deltaTime);
+            context.fillStyle = 'white';
+            context.fillRect(0, 0, 200, 100);
+            context.font = '25px Arial';
+            context.fillStyle = 'black';
+            context.fillText("FPS: " + fps, 10, 30);
+
+            game.update(deltaTime);
+            game.draw(context);
+
+            window.requestAnimationFrame(gameLoop);
+        }
+
+    </script>
+</body>
+
+</html>

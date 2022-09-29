@@ -5,7 +5,6 @@ export class Car {
         // Transform Properties
         this.position = position;
         this.rotation = rotation;
-        this.size = [50, 100];
 
         // Rigidbody Properties
         this.velocity = [0, 0];

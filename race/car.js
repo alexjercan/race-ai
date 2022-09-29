@@ -1,3 +1,5 @@
+import { RectRenderer, PolygonRenderer } from "./engine/renderer.js"
+
 export class Car {
     constructor(position = [0, 0], rotation = 0) {
         // Transform Properties
@@ -12,6 +14,15 @@ export class Car {
         this.turnSpeed = Math.PI / 2;
         this.topSpeed = 100;
         this.acceleration = 50;
+
+        // Render Properties
+        this.renderer = {
+            body: new RectRenderer("#ff8080", 0, 0, 50, 100),
+            win: new PolygonRenderer("#8080ff", [{x: -20, y: -15}, {x: 20, y: -15}, {x: 15, y: 0}, {x: -15, y: 0}]),
+            bwin: new PolygonRenderer("#8080ff", [{x: -14, y: 30}, {x: 14, y: 30}, {x: 18, y: 40}, {x: -18, y: 40}]),
+            headL: new PolygonRenderer("#ffe4b5", [{x: -20, y: -50}, {x: -10, y: -50}, {x: -12, y: -45}, {x: -18, y: -45}]),
+            headR: new PolygonRenderer("#ffe4b5", [{x: 20, y: -50}, {x: 10, y: -50}, {x: 12, y: -45}, {x: 18, y: -45}]),
+        };
     }
 
     move(velocityInput, angleInput, deltaTime) {
@@ -27,7 +38,6 @@ export class Car {
         this.velocity[0] = (this.velocity[0] * slowdown + velocityDelta * Math.sin(this.rotation));
         this.velocity[1] = (this.velocity[1] * slowdown - velocityDelta * Math.cos(this.rotation));
 
-
         this.velocity[0] = Math.min(Math.max(this.velocity[0], -1 * this.topSpeed), this.topSpeed);
         this.velocity[1] = Math.min(Math.max(this.velocity[1], -1 * this.topSpeed), this.topSpeed);
 
@@ -38,15 +48,13 @@ export class Car {
     }
 
     draw(context) {
-        context.fillStyle = '#ff8080';
-
-        const centerX = this.position[0] + this.size[0] / 2;
-        const centerY = this.position[1] + this.size[1] / 2;
-        context.translate(centerX, centerY);
+        context.translate(this.position[0], this.position[1]);
         context.rotate(this.rotation);
-        context.translate(-centerX, -centerY);
 
-        context.fillRect(this.position[0], this.position[1], this.size[0], this.size[1]);
+        for (const key in this.renderer) {
+            this.renderer[key].draw(context);
+        }
+
         context.setTransform(1, 0, 0, 1, 0, 0);
     }
 }

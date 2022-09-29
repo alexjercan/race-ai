@@ -1,10 +1,11 @@
+import { Point } from "./engine/point.js"
 import { Car } from "./car.js"
 
 export class Game {
     constructor(input) {
         this.input = input;
 
-        this.player = new Car([100, 50], 0);
+        this.player = new Car(new Point(100, 100), 0);
     }
 
     update(deltaTime) {

@@ -1,53 +1,52 @@
-import { RectRenderer, PolygonRenderer } from "./engine/renderer.js"
+import * as math from "./engine/math.js";
+import { Point } from "./engine/point.js";
+import { RectRenderer, PolygonRenderer } from "./engine/renderer.js";
 
 export class Car {
-    constructor(position = [0, 0], rotation = 0) {
-        // Transform Properties
-        this.position = position;
+    constructor(position = null, rotation = 0) {
+        //Transform Properties
+        this.position = position ?? new Point(0, 0);
         this.rotation = rotation;
 
-        // Rigidbody Properties
-        this.velocity = [0, 0];
+        // RigidBody Properties
+        this.velocity = new Point(0, 0);
 
         // Car Properties
         this.turnSpeed = Math.PI / 2;
-        this.topSpeed = 100;
-        this.acceleration = 50;
+        this.topSpeed = 200;
+        this.acceleration = 100;
 
         // Render Properties
         this.renderer = {
             body: new RectRenderer("#ff8080", 0, 0, 50, 100),
-            win: new PolygonRenderer("#8080ff", [{x: -20, y: -15}, {x: 20, y: -15}, {x: 15, y: 0}, {x: -15, y: 0}]),
-            bwin: new PolygonRenderer("#8080ff", [{x: -14, y: 30}, {x: 14, y: 30}, {x: 18, y: 40}, {x: -18, y: 40}]),
-            headL: new PolygonRenderer("#ffe4b5", [{x: -20, y: -50}, {x: -10, y: -50}, {x: -12, y: -45}, {x: -18, y: -45}]),
-            headR: new PolygonRenderer("#ffe4b5", [{x: 20, y: -50}, {x: 10, y: -50}, {x: 12, y: -45}, {x: 18, y: -45}]),
+            win: new PolygonRenderer("#8080ff", [new Point(-20, -15), new Point(20, -15), new Point(15, 0), new Point(-15, 0)]),
+            bwin: new PolygonRenderer("#8080ff", [new Point(-14, 30), new Point(14, 30), new Point(18, 40), new Point(-18, 40)]),
+            headL: new PolygonRenderer("#ffe4b5", [new Point(-20, -50), new Point(-10, -50), new Point(-12, -45), new Point(-18, -45)]),
+            headR: new PolygonRenderer("#ffe4b5", [new Point(20, -50), new Point(10, -50), new Point(12, -45), new Point(18, -45)]),
         };
     }
 
     move(velocityInput, angleInput, deltaTime) {
         const velocityDelta = velocityInput * deltaTime * this.acceleration;
 
-        const forward = [Math.sin(this.rotation), -1 * Math.cos(this.rotation)];
-        const magnitude = Math.sqrt(this.velocity[0] * this.velocity[0] + this.velocity[1] * this.velocity[1]);
-        const dot = (magnitude === 0) ? 0 : (forward[0] * this.velocity[0] + forward[1] * this.velocity[1]) / magnitude;
-        const oldRange = [-1, 1];
-        const newRange = [0.95, 0.99];
-        const slowdown = Math.min(Math.max((dot - oldRange[0]) * (newRange[1] - newRange[0]) / (oldRange[1] - oldRange[0]) + newRange[0], newRange[0]) , newRange[1]);
+        const forward = new Point(Math.sin(this.rotation), -1 * Math.cos(this.rotation));
+        const magnitude = this.velocity.magnitude();
+        const dot = (magnitude === 0) ? 0 : forward.dot(this.velocity) / magnitude;
+        const slowdown = math.map(dot, [-1, 1], [0.95, 0.99]);
 
-        this.velocity[0] = (this.velocity[0] * slowdown + velocityDelta * Math.sin(this.rotation));
-        this.velocity[1] = (this.velocity[1] * slowdown - velocityDelta * Math.cos(this.rotation));
+        this.velocity.x = (this.velocity.x * slowdown + velocityDelta * Math.sin(this.rotation));
+        this.velocity.y = (this.velocity.y * slowdown - velocityDelta * Math.cos(this.rotation));
 
-        this.velocity[0] = Math.min(Math.max(this.velocity[0], -1 * this.topSpeed), this.topSpeed);
-        this.velocity[1] = Math.min(Math.max(this.velocity[1], -1 * this.topSpeed), this.topSpeed);
+        this.velocity = math.clampPoint(this.velocity, this.topSpeed);
 
-        this.position[0] += this.velocity[0] * deltaTime;
-        this.position[1] += this.velocity[1] * deltaTime;
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
 
         this.rotation += angleInput * this.turnSpeed * deltaTime;
     }
 
     draw(context) {
-        context.translate(this.position[0], this.position[1]);
+        context.translate(this.position.x, this.position.y);
         context.rotate(this.rotation);
 
         for (const key in this.renderer) {
@@ -55,6 +54,6 @@ export class Car {
         }
 
         context.rotate(-1 * this.rotation);
-        context.translate(-1 * this.position[0], -1 * this.position[1]);
+        context.translate(-1 * this.position.x, -1 * this.position.y);
     }
 }

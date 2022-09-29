@@ -54,6 +54,7 @@ export class Car {
             this.renderer[key].draw(context);
         }
 
-        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.rotate(-1 * this.rotation);
+        context.translate(-1 * this.position[0], -1 * this.position[1]);
     }
 }

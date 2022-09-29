@@ -1,21 +1,17 @@
-import { LineRenderer } from "./engine/renderer.js";
+import { TrackRenderer } from "./engine/renderer.js";
 
 export class Track {
     constructor(waypoints) {
         // Renderer Properties
-        this.renderer = [];
-
-        for (let i = 1; i < waypoints.length; i++) {
-            const start = waypoints[i - 1];
-            const end = waypoints[i];
-
-            this.renderer.push(new LineRenderer("#808080", start, end, 100));
+        this.radius = 50;
+        this.renderer = {
+            track: new TrackRenderer("#808080", waypoints, this.radius * 2),
         }
     }
 
     draw(context) {
-        for (let i = 0; i < this.renderer.length; i++) {
-            this.renderer[i].draw(context);
+        for (const key in this.renderer) {
+            this.renderer[key].draw(context);
         }
     }
 }

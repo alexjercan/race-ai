@@ -1,5 +1,3 @@
-import { Point } from "./point.js";
-
 export class RectRenderer {
     constructor(fillStyle, x, y, width, height) {
         this.fillStyle = fillStyle;
@@ -33,37 +31,34 @@ export class PolygonRenderer {
         }
         context.closePath();
 
-        context.stroke();
         context.fillStyle=this.fillStyle;
         context.fill();
     }
 
 }
 
-export class LineRenderer {
-    constructor(fillStyle, start, end, width) {
-        const direction = new Point(end.x - start.x, - end.y + start.y);
-        const height = direction.magnitude();
-
+export class TrackRenderer {
+    constructor(fillStyle, waypoints, width, lineCap="round") {
         this.fillStyle = fillStyle;
-        this.x = (start.x + end.x) / 2;
-        this.y = (start.y + end.y) / 2;
+        this.waypoints = waypoints;
         this.width = width;
-        this.height = height;
-        this.angle = Math.atan2(direction.x, direction.y);
+        this.lineCap = lineCap;
     }
 
     draw(context) {
-        console.log(this.x, this.y, this.width, this.height, this.angle);
-        context.translate(this.x, this.y);
-        context.rotate(this.angle);
-        context.translate(-1 * this.width / 2, -1 * this.height / 2);
+        context.beginPath();
 
-        context.fillStyle = this.fillStyle;
-        context.fillRect(0, 0, this.width, this.height);
+        for (let i = 0; i < this.waypoints.length - 1; i++) {
+            context.moveTo(this.waypoints[i].x, this.waypoints[i].y);
+            context.lineTo(this.waypoints[i + 1].x, this.waypoints[i + 1].y);
+        }
+        context.moveTo(this.waypoints[this.waypoints.length - 1].x, this.waypoints[this.waypoints.length - 1].y);
+        context.lineTo(this.waypoints[0].x, this.waypoints[0].y);
 
-        context.translate(this.width / 2, this.height / 2);
-        context.rotate(-1 * this.angle);
-        context.translate(-1 * this.x, -1 * this.y);
+        context.lineWidth = this.width;
+        context.strokeStyle = this.fillStyle;
+        context.lineCap = this.lineCap;
+
+        context.stroke();
     }
 }

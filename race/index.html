@@ -7,23 +7,39 @@
 </head>
 
 <body>
-    <canvas id="canvas" width="1000" height="1000"></canvas>
+    <div>
+        <div>
+            <input type="checkbox" id="debug" name="settings" value="debug" />
+            <label for="debug">debug</label>
+          </div>
+        <br/>
+        <canvas id="canvas" width="1000" height="1000"></canvas>
+    </div>
 
     <script type="module">
         "use strict";
         import { initializeGame } from "./index.js";
+        import { Debug } from "./debug.js";
 
         let canvas;
         let context;
         let oldTimeStamp = Date.now();
         let game;
+        let debugMode = false;
+        let debug;
 
         window.onload = init;
+
+        document.getElementById("debug").addEventListener("change", (event) => {
+            debugMode = event.target.checked;
+        });
 
         function init() {
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
             game = initializeGame("human");
+
+            debug = new Debug([game.player], game.track);
 
             window.requestAnimationFrame(gameLoop);
         }
@@ -38,10 +54,13 @@
             game.update(deltaTime);
             game.draw(context);
 
-            context.font = '25px Arial';
-            context.fillStyle = 'black';
-            context.fillText("FPS: " + fps, 10, 30);
+            if (debugMode) {
+                debug.draw(context);
 
+                context.font = '25px Arial';
+                context.fillStyle = 'black';
+                context.fillText("FPS: " + fps, 10, 30);
+            }
 
             window.requestAnimationFrame(gameLoop);
         }

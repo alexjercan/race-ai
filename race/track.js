@@ -2,8 +2,10 @@ import { TrackRenderer } from "./engine/renderer.js";
 
 export class Track {
     constructor(waypoints, radius=50) {
-        // Renderer Properties
         this.radius = radius;
+        this.waypoints = waypoints;
+
+        // Renderer Properties
         this.renderer = {
             track: new TrackRenderer("#808080", waypoints, this.radius * 2),
         }

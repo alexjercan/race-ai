@@ -7,7 +7,7 @@ export class Game {
         this.input = input;
 
         this.player = new Car(new Point(100, 100), Math.atan2(100, -400));
-        this.track = new Track([new Point(100, 100), new Point(200, 500), new Point(500, 500), new Point(700, 100)]);
+        this.track = new Track([new Point(100, 100), new Point(200, 500), new Point(500, 500), new Point(700, 100)]);    
     }
 
     update(deltaTime) {

@@ -11,4 +11,14 @@ export class Point {
     dot(other) {
         return other.x * this.x + other.y * this.y;
     }
+
+    normalize() {
+        const magnitude = this.magnitude();
+
+        if (magnitude === 0) {
+            return new Point(0, 0);
+        }
+
+        return new Point(this.x / magnitude, this.y / magnitude);
+    }
 }

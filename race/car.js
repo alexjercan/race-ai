@@ -1,12 +1,16 @@
 import * as math from "./engine/math.js";
 import { Point } from "./engine/point.js";
-import { RectRenderer, PolygonRenderer } from "./engine/renderer.js";
+import { RectRenderer, PolygonRenderer, TextRenderer } from "./engine/renderer.js";
 
 export class Car {
-    constructor(position = null, rotation = 0) {
+    constructor(track) {
         //Transform Properties
-        this.position = position ?? new Point(0, 0);
-        this.rotation = rotation;
+        this.position = new Point(track.waypoints[0].x, track.waypoints[0].y);
+        const direction = new Point(
+            track.waypoints[1].x - track.waypoints[0].x,
+            track.waypoints[1].y - track.waypoints[0].y
+        )
+        this.rotation = Math.atan2(direction.x, -1 * direction.y);
 
         // RigidBody Properties
         this.velocity = new Point(0, 0);
@@ -15,6 +19,10 @@ export class Car {
         this.turnSpeed = Math.PI / 2;
         this.topSpeed = 200;
         this.acceleration = 100;
+
+        this.track = track;
+        this.nextWaypointIndex = 1;
+        this.laps = 0;
 
         // Render Properties
         this.renderer = {
@@ -43,6 +51,19 @@ export class Car {
         this.position.y += this.velocity.y * deltaTime;
 
         this.rotation += angleInput * this.turnSpeed * deltaTime;
+
+        const nextWaypoint = this.track.waypoints[this.nextWaypointIndex];
+        const distance = new Point(
+            nextWaypoint.x - this.position.x,
+            nextWaypoint.y - this.position.y
+        ).magnitude();
+
+        if (distance <= this.track.radius) {
+            this.nextWaypointIndex = (this.nextWaypointIndex + 1) % this.track.waypoints.length;
+            if (this.nextWaypointIndex === 1) {
+                this.laps++;
+            }
+        }
     }
 
     draw(context) {

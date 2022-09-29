@@ -62,3 +62,19 @@ export class TrackRenderer {
         context.stroke();
     }
 }
+
+export class TextRenderer {
+    constructor(text, fillStyle, font, x, y) {
+        this.text = text;
+        this.fillStyle = fillStyle;
+        this.font = font;
+        this.x = x;
+        this.y = y;
+    }
+
+    draw(context) {
+        context.font = this.font;
+        context.fillStyle = this.fillStyle;
+        context.fillText(this.text, this.x, this.y);
+    }
+}

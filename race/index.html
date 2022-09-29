@@ -18,7 +18,7 @@
 
     <script type="module">
         "use strict";
-        import { initializeGame } from "./index.js";
+        import { Game } from "./game.js";
         import { Debug } from "./debug.js";
 
         let canvas;
@@ -37,7 +37,7 @@
         function init() {
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
-            game = initializeGame("human");
+            game = new Game("human");
 
             debug = new Debug([game.player], game.track);
 
@@ -59,7 +59,7 @@
 
                 context.font = '25px Arial';
                 context.fillStyle = 'black';
-                context.fillText("FPS: " + fps, 10, 30);
+                context.fillText("FPS: " + fps + " LAPS: " + game.player.laps, 10, 30);
             }
 
             window.requestAnimationFrame(gameLoop);

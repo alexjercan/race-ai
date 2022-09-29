@@ -1,13 +1,17 @@
 import { Point } from "./engine/point.js";
 import { Car } from "./car.js";
 import { Track } from "./track.js";
+import { HumanInput } from "./humanInput.js";
 
 export class Game {
-    constructor(input) {
-        this.input = input;
-
-        this.player = new Car(new Point(100, 100), Math.atan2(100, -400));
+    constructor(inputType) {
         this.track = new Track([new Point(100, 100), new Point(200, 500), new Point(500, 500), new Point(700, 100)]);    
+
+        this.player = new Car(this.track);
+
+        if (inputType === "human") {
+            this.input = new HumanInput(document);
+        }
     }
 
     update(deltaTime) {

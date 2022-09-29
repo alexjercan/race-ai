@@ -7,7 +7,7 @@
 </head>
 
 <body>
-    <canvas id="canvas" width="750" height="400"></canvas>
+    <canvas id="canvas" width="1000" height="1000"></canvas>
 
     <script type="module">
         "use strict";
@@ -35,12 +35,13 @@
             const fps = Math.round(1 / deltaTime);
             context.clearRect(0, 0, canvas.width, canvas.height);
 
+            game.update(deltaTime);
+            game.draw(context);
+
             context.font = '25px Arial';
             context.fillStyle = 'black';
             context.fillText("FPS: " + fps, 10, 30);
 
-            game.update(deltaTime);
-            game.draw(context);
 
             window.requestAnimationFrame(gameLoop);
         }

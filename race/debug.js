@@ -12,7 +12,7 @@ export class Debug {
         this.debugTrack.draw(context);
 
         this.cars.forEach((car) => {
-            const closestPoint = car.getClosestPoint(this.track.waypoints).point;
+            const closestPoint = car.getClosestPoint().point;
 
             context.beginPath();
             context.moveTo(car.position.x, car.position.y);

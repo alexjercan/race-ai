@@ -78,7 +78,7 @@ export class Car {
         context.translate(-1 * this.position.x, -1 * this.position.y);
     }
 
-    getClosestPoint(waypoints) {
+    getClosestPoint() {
         function getDistance(position, point1, point2) {
             const point = math.getProjectionOnSegment(position, point1, point2);
 
@@ -93,6 +93,7 @@ export class Car {
 
         const distances = [];
 
+        const waypoints = this.track.waypoints;
         for (let i = 0; i < waypoints.length - 1; i++) {
             const waypoint = waypoints[i];
             const nextWaypoint = waypoints[i + 1];

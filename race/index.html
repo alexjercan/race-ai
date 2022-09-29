@@ -18,7 +18,7 @@
 
     <script type="module">
         "use strict";
-        import { Game } from "./game.js";
+        import { WebGame } from "./webGame.js";
         import { Debug } from "./debug.js";
 
         let canvas;
@@ -37,7 +37,7 @@
         function init() {
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
-            game = new Game("human");
+            game = new WebGame();
 
             debug = new Debug([game.player], game.track);
 

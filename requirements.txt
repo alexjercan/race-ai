@@ -1,0 +1,4 @@
+cloudpickle==2.2.0
+gym==0.26.1
+gym-notices==0.0.8
+numpy==1.23.3

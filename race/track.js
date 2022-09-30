@@ -7,6 +7,7 @@ export class Track {
         this.waypoints = waypoints;
 
         this.initCollider();
+        this.initDistances();
 
         // Renderer Properties
         this.renderer = {
@@ -34,6 +35,22 @@ export class Track {
             this.edgesInner.push(new Point(prevTranslation.x + nextTranslation.x + waypoint.x, prevTranslation.y + nextTranslation.y + waypoint.y));
             this.edgesOuter.push(new Point(waypoint.x - prevTranslation.x - nextTranslation.x, waypoint.y - prevTranslation.y - nextTranslation.y));
         }
+    }
+
+    initDistances() {
+        const waypoints = this.waypoints;
+        const n = waypoints.length;
+
+        this.distances = []
+        let distance = 0;
+        for (let i = 0; i < n; i++) {
+            const i1 = (i + 1) % n;
+            this.distances.push(distance);
+            distance += new Point(waypoints[i1].x - waypoints[i].x, waypoints[i1].y - waypoints[i].y).magnitude();
+        }
+        this.distances.push(distance);
+
+        this.totalDistance = distance;
     }
 
     draw(context) {

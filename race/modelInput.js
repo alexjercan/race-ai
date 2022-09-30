@@ -66,5 +66,34 @@ export class ModelInput {
 
         return input;
     }
+
+    reward() {
+        const distanceFromTrack = this.player.getClosestPoint().distance;
+
+        if (distanceFromTrack > this.player.track.radius) {
+            return -10;
+        }
+
+        const track = this.player.track;
+        const n = track.waypoints.length;
+        const nextWaypointIndex = this.player.nextWaypointIndex;
+        const waypointIndex = ((nextWaypointIndex - 1) % n + n) % n;
+
+        const proj = math.getProjectionOnSegment(this.player.position, track.waypoints[waypointIndex], track.waypoints[nextWaypointIndex]);
+        const distance = track.distances[waypointIndex] + new Point(proj.x - track.waypoints[waypointIndex].x, proj.y - track.waypoints[waypointIndex].y).magnitude();
+        const totalDistance = track.totalDistance;
+
+        return this.player.laps + distance / totalDistance;
+    }
+
+    done() {
+        const distanceFromTrack = this.player.getClosestPoint().distance;
+
+        if (distanceFromTrack > this.player.track.radius) {
+            return true;
+        }
+
+        return false;
+    }
 }
 

@@ -17,6 +17,10 @@ export class StdinGame {
 
         this.player.move(input[0], input[1], deltaTime);
 
-        console.log(this.modelInput.observations());
+        console.log({
+            observations: this.modelInput.observations(),
+            reward: this.modelInput.reward(),
+            done: this.modelInput.done(),
+        });
     }
 }

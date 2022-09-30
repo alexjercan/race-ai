@@ -59,7 +59,7 @@
 
                 context.font = '25px Arial';
                 context.fillStyle = 'black';
-                context.fillText("FPS: " + fps + " LAPS: " + game.player.laps, 10, 30);
+                context.fillText("FPS: " + fps + " LAPS: " + game.player.laps + " Reward: " + debug.modelInputs[0].reward(), 10, 30);
             }
 
             window.requestAnimationFrame(gameLoop);

@@ -20,13 +20,15 @@ export class Car {
         this.topSpeed = 200;
         this.acceleration = 100;
 
+        this.dimensions = new Point(50, 100);
+
         this.track = track;
         this.nextWaypointIndex = 1;
         this.laps = 0;
 
         // Render Properties
         this.renderer = {
-            body: new RectRenderer("#ff8080", 0, 0, 50, 100),
+            body: new RectRenderer("#ff8080", 0, 0, this.dimensions.x, this.dimensions.y),
             win: new PolygonRenderer("#8080ff", [new Point(-20, -15), new Point(20, -15), new Point(15, 0), new Point(-15, 0)]),
             bwin: new PolygonRenderer("#8080ff", [new Point(-14, 30), new Point(14, 30), new Point(18, 40), new Point(-18, 40)]),
             headL: new PolygonRenderer("#ffe4b5", [new Point(-20, -50), new Point(-10, -50), new Point(-12, -45), new Point(-18, -45)]),
@@ -87,7 +89,9 @@ export class Car {
                 distance: new Point(
                     point.x - position.x,
                     point.y - position.y
-                ).magnitude()
+                ).magnitude(),
+                start: point1,
+                end: point2,
             }
         }
 

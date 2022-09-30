@@ -12,6 +12,10 @@ export class Point {
         return other.x * this.x + other.y * this.y;
     }
 
+    cross(other) {
+        return this.x * other.y - this.y * other.x;
+    }
+
     normalize() {
         const magnitude = this.magnitude();
 

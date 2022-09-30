@@ -1,7 +1,10 @@
+import os
 import gym
-import numpy as np
-
+import time
 import torch
+import datetime
+
+import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -15,6 +18,9 @@ from typing import Union, Tuple, Callable
 from torch import Tensor
 
 sns.set()
+
+models_path = os.path.join("models")
+os.makedirs(models_path, exist_ok=True)
 
 
 class ReplayBuffer(object):
@@ -51,7 +57,9 @@ class ReplayBuffer(object):
         self.actions[self.idx] = torch.tensor(a)
         self.rewards[self.idx] = torch.tensor(r)
         self.done[self.idx] = torch.tensor(done)
-        self.states_next[self.idx] = s_next.clone() if isinstance(s_next, Tensor) else torch.tensor(s_next)
+        self.states_next[self.idx] = (
+            s_next.clone() if isinstance(s_next, Tensor) else torch.tensor(s_next)
+        )
 
     def sample(
         self, batch_size: int = 128
@@ -143,7 +151,7 @@ def ddqn_target(
 
 def learning(
     env: gym.Env,
-    targert_function: Callable,
+    target_function: Callable,
     batch_size: int = 128,
     gamma: float = 0.99,
     replay_buffer_size=10000,
@@ -171,11 +179,13 @@ def learning(
     num_param_updates = 0
     mean_rewards = []
 
+    time_start = time.time()
+
     for episode in range(1, num_episodes + 1):
         s = env.reset()
         episode_reward = 0
 
-        for _ in count():
+        for _ in range(60 * 60):
             total_steps += 1
 
             if total_steps > learning_starts:
@@ -214,7 +224,7 @@ def learning(
 
                     Q_values = Q(s_batch).gather(1, a_batch.unsqueeze(1)).view(-1)
 
-                    target_Q_values = targert_function(
+                    target_Q_values = target_function(
                         Q, target_Q, r_batch, s_next_batch, done_batch, gamma
                     )
 
@@ -233,11 +243,21 @@ def learning(
 
         if episode % log_every == 0 and total_steps > learning_starts:
             mean_episode_reward = np.mean(all_episode_rewards[-100:])
+            time_elapsed = time.time() - time_start
+            time_remaining = time_elapsed / episode * (num_episodes - episode)
+
+            time_elapsed_str = str(datetime.timedelta(seconds=int(time_elapsed)))
+            time_remaining_str = str(datetime.timedelta(seconds=int(time_remaining)))
+
             print(
-                "Episode: %d, Mean reward: %.2f, Eps: %.2f"
-                % (episode, mean_episode_reward, eps)
+                f"Episode: {episode}, Mean reward: {mean_episode_reward:.2f}, Eps: {eps:.2f}, Time: {time_elapsed_str}, Remaining: {time_remaining_str}"
             )
             mean_rewards.append(mean_episode_reward)
+
+            name = target_function.__name__.split("_")[0]
+            torch.save(
+                Q.state_dict(), os.path.join(models_path, f"{name}_{episode}.pth")
+            )
 
     return mean_rewards
 
@@ -246,7 +266,7 @@ if __name__ == "__main__":
     env = RaceEnv()
     dqm_mean_rewards = learning(
         env=env,
-        targert_function=dqn_target,
+        target_function=dqn_target,
         batch_size=128,
         gamma=0.99,
         replay_buffer_size=10000,
@@ -260,7 +280,7 @@ if __name__ == "__main__":
     env = RaceEnv()
     ddqm_mean_rewards = learning(
         env=env,
-        targert_function=ddqn_target,
+        target_function=ddqn_target,
         batch_size=128,
         gamma=0.99,
         replay_buffer_size=10000,
@@ -279,4 +299,6 @@ if __name__ == "__main__":
     plt.title("Reward curve")
 
     plt.legend()
+
+    plt.savefig(os.path.join(models_path, "reward_curve.png"))
     plt.show()

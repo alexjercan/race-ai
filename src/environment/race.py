@@ -19,13 +19,7 @@ class RaceEnv(Env):
 
         self.observation_space = spaces.Box(low=-1.0, high=1.0, shape=(8,))
 
-        self.action_space = spaces.Tuple(
-            [
-                spaces.Discrete(3),
-                spaces.Discrete(3),
-            ]
-        )
-        self.action_space.n = 3 * 3
+        self.action_space = spaces.Discrete(9)
 
     def reset(self):
         if self.process is not None:
@@ -53,11 +47,11 @@ class RaceEnv(Env):
             self.process.kill()
 
     def step(self, action):
-        done = False
-
         assert self.action_space.contains(action), f"Invalid Action {action}"
 
-        model_input = f"{action[0]:.02f} {action[1]:.02f}\n"
+        acc, steer = (action % 3 - 1, action // 3 - 1)
+
+        model_input = f"{acc} {steer}\n"
         self.process.stdin.write(model_input)
         self.process.stdin.flush()
 

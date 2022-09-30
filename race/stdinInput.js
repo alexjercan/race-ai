@@ -15,6 +15,6 @@ export class StdinInput {
     }
 
     output(data) {
-        console.log(data);
+        console.log(JSON.stringify(data));
     }
 }

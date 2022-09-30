@@ -1,13 +1,15 @@
+import gym
+import numpy as np
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+
 from environment import RaceEnv
+from gym import Env
+from itertools import count
+from typing import Union, Tuple, Callable
+from torch import Tensor
 
-env = RaceEnv()
 
-obs = env.reset()
-print(obs)
-
-action = env.action_space.sample()
-obs, reward, done, info = env.step(action)
-
-env.close()
-
-print(obs, action, reward, done, info)

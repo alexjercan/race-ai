@@ -1,11 +1,14 @@
 import subprocess
 import json
 
+import numpy as np
+
 from gym import Env, spaces
 
 OBSERVATIONS = "observations"
 REWARD = "reward"
 DONE = "done"
+
 
 class RaceEnv(Env):
     def __init__(self, path="./race/index.js"):
@@ -16,7 +19,13 @@ class RaceEnv(Env):
 
         self.observation_space = spaces.Box(low=-1.0, high=1.0, shape=(8,))
 
-        self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(2,))
+        self.action_space = spaces.Tuple(
+            [
+                spaces.Discrete(3),
+                spaces.Discrete(3),
+            ]
+        )
+        self.action_space.n = 3 * 3
 
     def reset(self):
         if self.process is not None:
@@ -34,7 +43,7 @@ class RaceEnv(Env):
 
         data = json.loads(self.process.stdout.readline())
 
-        return data[OBSERVATIONS]
+        return np.array(data[OBSERVATIONS])
 
     def render(self):
         pass
@@ -46,7 +55,7 @@ class RaceEnv(Env):
     def step(self, action):
         done = False
 
-        assert self.action_space.contains(action), "Invalid Action"
+        assert self.action_space.contains(action), f"Invalid Action {action}"
 
         model_input = f"{action[0]:.02f} {action[1]:.02f}\n"
         self.process.stdin.write(model_input)
@@ -54,5 +63,4 @@ class RaceEnv(Env):
 
         data = json.loads(self.process.stdout.readline())
 
-        return data[OBSERVATIONS], data[REWARD], data[DONE], []
-
+        return np.array(data[OBSERVATIONS]), data[REWARD], data[DONE], []

@@ -1,5 +1,27 @@
 # Race-AI
 
+## Quickstart
+
+To be able to play around with the manual car you can start a http server in
+the race directory and open the browser at `localhost:8000`.
+
+```console
+cd race
+python -m http.server
+```
+
+To run the python training script you have to install the dependencies using
+venv and run the training script.
+
+```console
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python src/train.py
+```
+
+## Plan
+
 - [ ] Implement racing game
     - [X] Map generation (Should be a simple map made with waypoints)
     - [X] Implement a car object that can be moved on the canvas
@@ -11,7 +33,7 @@
     - [X] Implement the reward
     - [ ] Implement model loading and wait input functions
 - [ ] Implement RL algorithm to play the racing game
-    - [ ] Implement OpenAI Gym environment that will use subprocess to run the game
+    - [X] Implement OpenAI Gym environment that will use subprocess to run the game
     - [ ] Implement DQN algorithm to train a simple model
     - [ ] Export model (Maybe to JSON)
     - [ ] Implement a game loop that will load the model and use it to generate input

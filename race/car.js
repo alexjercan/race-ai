@@ -81,6 +81,10 @@ export class Car {
     }
 
     getClosestPoint() {
+        return this.getClosestPoint(null, null);
+    }
+
+    getClosestPoint(from=null, points=null) {
         function getDistance(position, point1, point2) {
             const point = math.getProjectionOnSegment(position, point1, point2);
 
@@ -95,17 +99,18 @@ export class Car {
             }
         }
 
+        const position = from ?? this.position;
+        const waypoints = points ?? this.track.waypoints;
         const distances = [];
 
-        const waypoints = this.track.waypoints;
         for (let i = 0; i < waypoints.length - 1; i++) {
             const waypoint = waypoints[i];
             const nextWaypoint = waypoints[i + 1];
 
-            distances.push(getDistance(this.position, waypoint, nextWaypoint));
+            distances.push(getDistance(position, waypoint, nextWaypoint));
         }
 
-        distances.push(getDistance(this.position, waypoints[waypoints.length - 1], waypoints[0]));
+        distances.push(getDistance(position, waypoints[waypoints.length - 1], waypoints[0]));
 
         const min = Math.min(...distances.map((distance) => distance.distance));
         const minIndex = distances.map((distance) => distance.distance).indexOf(min);

@@ -9,7 +9,7 @@ export class Debug {
         this.debugTrack = new TrackRenderer("#00ff00", track.waypoints, 1, "butt")
         this.debugTrackInner = new TrackRenderer("#00ff00", track.edgesInner, 1, "butt")
         this.debugTrackOuter = new TrackRenderer("#00ff00", track.edgesOuter, 1, "butt")
-        this.modelInputs = cars.map(car => new ModelInput(car));
+        this.modelInputs = cars.map(car => new ModelInput(car, 2));
     }
 
     draw(context) {
@@ -32,6 +32,20 @@ export class Debug {
             modelInput.rays.forEach((rayEnd) => {
                 const rayEndX = rayEnd.x * Math.cos(modelInput.player.rotation) - rayEnd.y * Math.sin(modelInput.player.rotation);
                 const rayEndY = rayEnd.x * Math.sin(modelInput.player.rotation) + rayEnd.y * Math.cos(modelInput.player.rotation);
+
+                context.beginPath();
+                context.moveTo(modelInput.player.position.x, modelInput.player.position.y);
+                context.lineTo(modelInput.player.position.x + rayEndX, modelInput.player.position.y + rayEndY);
+                context.lineWidth = 1;
+                context.strokeStyle = "#ff0000";
+                context.stroke();
+            });
+
+            const obs = modelInput.observations();
+            modelInput.rays.forEach((rayEnd, index) => {
+
+                const rayEndX = obs[index] * (rayEnd.x * Math.cos(modelInput.player.rotation) - rayEnd.y * Math.sin(modelInput.player.rotation));
+                const rayEndY = obs[index] * (rayEnd.x * Math.sin(modelInput.player.rotation) + rayEnd.y * Math.cos(modelInput.player.rotation));
 
                 context.beginPath();
                 context.moveTo(modelInput.player.position.x, modelInput.player.position.y);

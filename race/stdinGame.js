@@ -10,6 +10,12 @@ export class StdinGame {
         this.player = new Car(this.track);
         this.input = new StdinInput();
         this.modelInput = new ModelInput(this.player);
+
+        this.input.output({
+            observations: this.modelInput.observations(),
+            reward: this.modelInput.reward(),
+            done: this.modelInput.done(),
+        });
     }
 
     async update(deltaTime) {

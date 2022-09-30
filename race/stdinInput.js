@@ -11,7 +11,7 @@ export class StdinInput {
     }
 
     async waitInput() {
-        return (await this.it.next()).value.trim().split(" ").map((i) => parseInt(i));
+        return (await this.it.next()).value.trim().split(" ").map((i) => parseFloat(i));
     }
 
     output(data) {

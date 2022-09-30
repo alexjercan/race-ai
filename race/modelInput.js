@@ -19,27 +19,37 @@ export class ModelInput {
     }
 
     computeLambdaLine(ray, edges) {
-        const {start, end} = this.player.getClosestPoint(ray, edges);
+        const ts = [];
 
-        const p = this.player.position;
-        const r = new Point(ray.x - p.x, ray.y - p.y);;
+        for (let i = 0; i < edges.length; i++) {
+            const start = edges[i];
+            const end = edges[(i + 1) % edges.length];
 
-        const q = start;
-        const s = new Point(end.x - q.x, end.y - q.y);
+            const p = this.player.position;
+            const r = new Point(ray.x - p.x, ray.y - p.y);;
 
-        const rxs = r.cross(s);
+            const q = start;
+            const s = new Point(end.x - q.x, end.y - q.y);
 
-        if (rxs === 0) {
-            return 1;
+            const rxs = r.cross(s);
+
+            if (rxs !== 0) {
+                const t = new Point(q.x - p.x, q.y - p.y).cross(s) / rxs;
+                const u = new Point(q.x - p.x, q.y - p.y).cross(r) / rxs;
+
+                if (0 <= t && t <= 1 && 0 <= u && u <= 1) {
+                    ts.push(t);
+                }
+            }
+
+            ts.push(1);
         }
 
-        const t = new Point(q.x - p.x, q.y - p.y).cross(s) / rxs;
-
-        return math.clamp(t, 0, 1);
+        return math.clamp(Math.min(...ts), 0, 1);
     }
 
     computeLambda(ray) {
-        return Math.max(this.computeLambdaLine(ray, this.player.track.edgesOuter), this.computeLambdaLine(ray, this.player.track.edgesInner));
+        return Math.min(this.computeLambdaLine(ray, this.player.track.edgesOuter), this.computeLambdaLine(ray, this.player.track.edgesInner));
     }
 
     observations() {

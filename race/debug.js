@@ -7,11 +7,15 @@ export class Debug {
         this.track = track;
 
         this.debugTrack = new TrackRenderer("#00ff00", track.waypoints, 1, "butt")
+        this.debugTrackInner = new TrackRenderer("#00ff00", track.edgesInner, 1, "butt")
+        this.debugTrackOuter = new TrackRenderer("#00ff00", track.edgesOuter, 1, "butt")
         this.modelInputs = cars.map(car => new ModelInput(car));
     }
 
     draw(context) {
         this.debugTrack.draw(context);
+        this.debugTrackInner.draw(context);
+        this.debugTrackOuter.draw(context);
 
         this.cars.forEach((car) => {
             const closestPoint = car.getClosestPoint().point;

@@ -11,6 +11,9 @@
         <div>
             <input type="checkbox" id="debug" name="settings" value="debug" />
             <label for="debug">debug</label>
+
+            <input type="checkbox" id="ai" name="ai" value="ai" />
+            <label for="ai">ai</label>
           </div>
         <br/>
         <canvas id="canvas" width="1000" height="1000"></canvas>
@@ -19,6 +22,7 @@
     <script type="module">
         "use strict";
         import { WebGame } from "./webGame.js";
+        import { ModelGame } from "./modelGame.js";
         import { Debug } from "./debug.js";
 
         let canvas;
@@ -34,12 +38,22 @@
             debugMode = event.target.checked;
         });
 
+        document.getElementById("ai").addEventListener("change", (event) => {
+            if (event.target.checked) {
+                game = new ModelGame();
+            } else {
+                game = new WebGame();
+            }
+
+            debug = new Debug(game);
+        });
+
         function init() {
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
             game = new WebGame();
 
-            debug = new Debug([game.player], game.track);
+            debug = new Debug(game);
 
             window.requestAnimationFrame(gameLoop);
         }

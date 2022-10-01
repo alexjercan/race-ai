@@ -2,14 +2,14 @@ import { TrackRenderer } from "./engine/renderer.js";
 import { ModelInput } from "./modelInput.js";
 
 export class Debug {
-    constructor(cars, track) {
-        this.cars = cars;
-        this.track = track;
+    constructor(game) {
+        this.cars = [game.player];
+        this.track = game.track;
 
-        this.debugTrack = new TrackRenderer("#00ff00", track.waypoints, 1, "butt")
-        this.debugTrackInner = new TrackRenderer("#00ff00", track.edgesInner, 1, "butt")
-        this.debugTrackOuter = new TrackRenderer("#00ff00", track.edgesOuter, 1, "butt")
-        this.modelInputs = cars.map(car => new ModelInput(car, 2));
+        this.debugTrack = new TrackRenderer("#00ff00", this.track.waypoints, 1, "butt")
+        this.debugTrackInner = new TrackRenderer("#00ff00", this.track.edgesInner, 1, "butt")
+        this.debugTrackOuter = new TrackRenderer("#00ff00", this.track.edgesOuter, 1, "butt")
+        this.modelInputs = this.cars.map(car => new ModelInput(car, 2));
     }
 
     draw(context) {

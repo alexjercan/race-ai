@@ -5,6 +5,8 @@ export class PredictInput {
     }
 
     waitInput() {
-        return this.model.predict(this.modelInput.observations());
+        const proba = this.model.predict(this.modelInput.observations());
+        const action = proba.indexOf(Math.max(...proba));
+        return [action % 3 - 1, Math.floor(action / 3) - 1];
     }
 }

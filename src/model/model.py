@@ -70,22 +70,44 @@ class ReplayBuffer(object):
         return s, a, r, s_next, done
 
 
+def layer_to_json(layer, name):
+    if isinstance(layer, torch.nn.Linear):
+        return {
+            "name": name,
+            "type": "Linear",
+            "weight": layer.weight.tolist(),
+            "bias": layer.bias.tolist(),
+        }
+    if isinstance(layer, torch.nn.ReLU):
+        return {
+            "name": name,
+            "type": "ReLU",
+        }
+
+    raise ValueError(f"Unknown layer type: {type(layer)}")
+
+
 class DQN_RAM(nn.Module):
     def __init__(self, in_features: int, num_actions: int):
         super(DQN_RAM, self).__init__()
         self.in_features = in_features
         self.num_actions = num_actions
+        self.hidden_size = 4
 
-        self.fc1 = nn.Linear(in_features, 128)
+        self.fc1 = nn.Linear(in_features, self.hidden_size)
         self.act1 = nn.ReLU()
-        self.fc2 = nn.Linear(128, 128)
-        self.act2 = nn.ReLU()
-        self.fc3 = nn.Linear(128, num_actions)
+        self.fc2 = nn.Linear(self.hidden_size, num_actions)
 
     def forward(self, x):
         x = self.act1(self.fc1(x))
-        x = self.act2(self.fc2(x))
-        return self.fc3(x)
+        return self.fc2(x)
+
+    def to_json(self):
+        return [
+            layer_to_json(self.fc1, "fc1"),
+            layer_to_json(self.act1, "act1"),
+            layer_to_json(self.fc2, "fc2"),
+        ]
 
 
 def eps_generator(max_eps: float = 1.0, min_eps: float = 0.1, max_iter: int = 10000):
@@ -180,7 +202,7 @@ def learning(
         s = env.reset()
         episode_reward = 0
 
-        for _ in range(60 * 60):
+        for _ in range(60 * 60 * 3):
             total_steps += 1
 
             if total_steps > learning_starts:
@@ -237,7 +259,7 @@ def learning(
         all_episode_rewards.append(episode_reward)
 
         if episode % log_every == 0 and total_steps > learning_starts:
-            mean_episode_reward = np.mean(all_episode_rewards[-100:])
+            mean_episode_reward = np.mean(all_episode_rewards[-log_every:])
             time_elapsed = time.time() - time_start
             time_remaining = time_elapsed / episode * (num_episodes - episode)
 

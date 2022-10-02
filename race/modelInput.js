@@ -71,7 +71,7 @@ export class ModelInput {
         const distanceFromTrack = this.player.getClosestPoint().distance;
 
         if (distanceFromTrack > this.player.track.radius) {
-            return -10;
+            return 0;
         }
 
         const track = this.player.track;
@@ -88,10 +88,6 @@ export class ModelInput {
 
     done() {
         const distanceFromTrack = this.player.getClosestPoint().distance;
-
-        if (this.player.laps >= 3) {
-            return true;
-        }
 
         if (distanceFromTrack > this.player.track.radius) {
             return true;

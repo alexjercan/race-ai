@@ -14,37 +14,37 @@ os.makedirs(models_path, exist_ok=True)
 
 if __name__ == "__main__":
     env = RaceEnv()
-    dqm_mean_rewards = learning(
+    dqn_mean_rewards = learning(
         env=env,
         target_function=dqn_target,
         batch_size=128,
         gamma=0.99,
         replay_buffer_size=10000,
-        num_episodes=1000,
+        num_episodes=500,
         learning_starts=1000,
         learning_freq=4,
         target_update_freq=100,
-        log_every=100,
+        log_every=50,
         models_path=models_path,
     )
 
     env = RaceEnv()
-    ddqm_mean_rewards = learning(
+    ddqn_mean_rewards = learning(
         env=env,
         target_function=ddqn_target,
         batch_size=128,
         gamma=0.99,
         replay_buffer_size=10000,
-        num_episodes=1000,
+        num_episodes=500,
         learning_starts=1000,
-        learning_freq=8,
+        learning_freq=4,
         target_update_freq=100,
-        log_every=100,
+        log_every=50,
         models_path=models_path,
     )
 
-    plt.plot(dqm_mean_rewards, label="dqn")
-    plt.plot(ddqm_mean_rewards, label="ddqn")
+    plt.plot(dqn_mean_rewards, label="dqn")
+    plt.plot(ddqn_mean_rewards, label="ddqn")
 
     plt.xlabel(f"Episodes")
     plt.ylabel("Reward")

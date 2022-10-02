@@ -278,7 +278,7 @@ def learning(
             time_remaining_str = str(datetime.timedelta(seconds=int(time_remaining)))
 
             print(
-                f"Episode: {episode}, Mean reward: {mean_episode_reward:.2f}, Eps: {eps:.2f}, Time: {time_elapsed_str}, Remaining: {time_remaining_str}"
+                f"Episode: {episode}, Mean reward: {mean_episode_reward:.2f}, Best reward: {best_episode_reward:.2f}, Eps: {eps:.2f}, Time: {time_elapsed_str}, Remaining: {time_remaining_str}"
             )
             mean_rewards.append(mean_episode_reward)
 
@@ -287,11 +287,8 @@ def learning(
                 Q.state_dict(), os.path.join(models_path, f"{name}_{episode}.pth")
             )
 
-    if best_model:
-        print(
-            f"Best episode reward: {best_episode_reward}"
-        )
-        name = target_function.__name__.split("_")[0]
-        torch.save(best_model.state_dict(), os.path.join(models_path, f"{name}_best.pth"))
+    print(f"Best episode reward: {best_episode_reward}")
+    name = target_function.__name__.split("_")[0]
+    torch.save(best_model.state_dict(), os.path.join(models_path, f"{name}_best.pth"))
 
-    return mean_rewards
+    return all_episode_rewards, best_model

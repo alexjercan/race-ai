@@ -5,6 +5,7 @@ import seaborn as sns
 
 from environment import RaceEnv
 from model import learning, dqn_target, ddqn_target
+from pth_to_json import create_model
 
 sns.set()
 
@@ -14,37 +15,38 @@ os.makedirs(models_path, exist_ok=True)
 
 if __name__ == "__main__":
     env = RaceEnv()
-    dqn_mean_rewards = learning(
+    dqn_all_rewards, _ = learning(
         env=env,
         target_function=dqn_target,
         batch_size=128,
         gamma=0.99,
         replay_buffer_size=10000,
-        num_episodes=100,
+        num_episodes=500,
         learning_starts=1000,
         learning_freq=4,
         target_update_freq=100,
-        log_every=10,
+        log_every=50,
         models_path=models_path,
     )
-
+    
     env = RaceEnv()
-    ddqn_mean_rewards = learning(
+    ddqn_all_rewards, best_model = learning(
         env=env,
         target_function=ddqn_target,
         batch_size=128,
         gamma=0.99,
         replay_buffer_size=10000,
-        num_episodes=100,
+        num_episodes=500,
         learning_starts=1000,
         learning_freq=4,
         target_update_freq=100,
-        log_every=10,
+        log_every=50,
         models_path=models_path,
     )
+    create_model(best_model)
 
-    plt.plot(dqn_mean_rewards, label="dqn")
-    plt.plot(ddqn_mean_rewards, label="ddqn")
+    plt.plot(dqn_all_rewards, label="dqn")
+    plt.plot(ddqn_all_rewards, label="ddqn")
 
     plt.xlabel(f"Episodes")
     plt.ylabel("Reward")

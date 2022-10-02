@@ -37,4 +37,4 @@ python src/train.py
     - [X] Implement DQN algorithm to train a simple model
     - [X] Export model (Maybe to JSON)
     - [X] Implement a game loop that will load the model and use it to generate input
-    - [ ] Improve model performance (to actually drive a bit)
+    - [ ] Improve model performance

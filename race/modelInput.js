@@ -79,11 +79,25 @@ export class ModelInput {
         const nextWaypointIndex = this.player.nextWaypointIndex;
         const waypointIndex = ((nextWaypointIndex - 1) % n + n) % n;
 
-        const proj = math.getProjectionOnSegment(this.player.position, track.waypoints[waypointIndex], track.waypoints[nextWaypointIndex]);
-        const distance = track.distances[waypointIndex] + new Point(proj.x - track.waypoints[waypointIndex].x, proj.y - track.waypoints[waypointIndex].y).magnitude();
-        const totalDistance = track.totalDistance;
+        const waypoint = track.waypoints[waypointIndex];
+        const nextWaypoint = track.waypoints[nextWaypointIndex];
 
-        return this.player.laps + distance / totalDistance;
+        // const waypointVector = new Point(nextWaypoint.x - waypoint.x, nextWaypoint.y - waypoint.y);
+        // const playerForward = new Point(Math.sin(this.player.rotation), -1 * Math.cos(this.player.rotation));
+        // const dot = waypointVector.dot(playerForward);
+        // const denom = waypointVector.magnitude() * playerForward.magnitude();
+        // const cos = (denom === 0) ? 0 : dot / denom;
+
+        // if (cos < 0) {
+        //     return 0;
+        // }
+
+        const proj = math.getProjectionOnSegment(this.player.position, track.waypoints[waypointIndex], track.waypoints[nextWaypointIndex]);
+        const distance = track.distances[waypointIndex] + new Point(proj.x - waypoint.x, proj.y - waypoint.y).magnitude();
+        const totalDistance = track.totalDistance;
+        const progress = this.player.laps + distance / totalDistance;
+
+        return progress;
     }
 
     done() {

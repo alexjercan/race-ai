@@ -9,11 +9,15 @@
 <body>
     <div>
         <div>
-            <input type="checkbox" id="debug" name="settings" value="debug" />
-            <label for="debug">debug</label>
+            <div>
+                <input type="checkbox" id="debug" name="settings" value="debug" />
+                <label for="debug">debug</label>
+            </div>
 
-            <input type="checkbox" id="ai" name="ai" value="ai" />
-            <label for="ai">ai</label>
+            <div>
+                <input type="checkbox" id="ai" name="ai" value="ai" />
+                <label for="ai">ai</label>
+            </div>
           </div>
         <br/>
         <canvas id="canvas" width="1000" height="1000"></canvas>
@@ -24,6 +28,7 @@
         import { WebGame } from "./webGame.js";
         import { ModelGame } from "./modelGame.js";
         import { Debug } from "./debug.js";
+        import { track_waypoints } from "./track.js";
 
         let canvas;
         let context;
@@ -32,6 +37,7 @@
         let debugMode = false;
         let debug;
         let reward;
+        let track_name = "simple";
 
         window.onload = init;
 
@@ -41,9 +47,9 @@
 
         document.getElementById("ai").addEventListener("change", (event) => {
             if (event.target.checked) {
-                game = new ModelGame();
+                game = new ModelGame(track_name);
             } else {
-                game = new WebGame();
+                game = new WebGame(track_name);
             }
 
             debug = new Debug(game);
@@ -53,7 +59,7 @@
         function init() {
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
-            game = new WebGame();
+            game = new WebGame(track_name);
 
             debug = new Debug(game);
 

@@ -1,14 +1,13 @@
-import { Point } from "./engine/point.js";
 import { Car } from "./car.js";
-import { Track } from "./track.js";
+import { Track, track_waypoints } from "./track.js";
 import { PredictInput } from "./predictInput.js";
 import { ModelInput } from "./modelInput.js";
 import { data_layers } from "./model.js";
 import { Model } from "./torch/model.js";
 
 export class ModelGame {
-    constructor() {
-        this.track = new Track([new Point(100, 100), new Point(200, 500), new Point(500, 500), new Point(700, 100)]);
+    constructor(track_name="simple") {
+        this.track = new Track(track_waypoints[track_name]);
         this.player = new Car(this.track);
         this.modelInput = new ModelInput(this.player);
         const layers = JSON.parse(data_layers);

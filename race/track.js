@@ -1,6 +1,11 @@
 import { TrackRenderer } from "./engine/renderer.js";
 import { Point } from "./engine/point.js";
 
+export const track_waypoints = {
+    simple: [new Point(100, 100), new Point(200, 500), new Point(500, 500), new Point(700, 100)],
+    medium: [new Point(200, 100), new Point(100, 500), new Point(300, 800), new Point(700, 800), new Point(900, 500), new Point(500, 100)],
+} 
+
 export class Track {
     constructor(waypoints, radius=50) {
         this.radius = radius;

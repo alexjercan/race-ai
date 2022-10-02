@@ -2,7 +2,7 @@ import { Point } from "./engine/point.js";
 import * as math from "./engine/math.js";
 
 export class ModelInput {
-    constructor(player, rayLength=2) {
+    constructor(player, rayLength=4) {
         this.player = player;
         this.rayLength = rayLength;
 
@@ -16,6 +16,8 @@ export class ModelInput {
             new Point(-1 * this.player.dimensions.x * rayLength / 2, this.player.dimensions.y * rayLength / 2),
             new Point(-1 * this.player.dimensions.x * rayLength / 2, 0),
         ];
+
+        this.lastProgress = 0;
     }
 
     computeLambdaLine(ray, edges) {
@@ -82,22 +84,29 @@ export class ModelInput {
         const waypoint = track.waypoints[waypointIndex];
         const nextWaypoint = track.waypoints[nextWaypointIndex];
 
-        // const waypointVector = new Point(nextWaypoint.x - waypoint.x, nextWaypoint.y - waypoint.y);
-        // const playerForward = new Point(Math.sin(this.player.rotation), -1 * Math.cos(this.player.rotation));
-        // const dot = waypointVector.dot(playerForward);
-        // const denom = waypointVector.magnitude() * playerForward.magnitude();
-        // const cos = (denom === 0) ? 0 : dot / denom;
+        const waypointVector = new Point(nextWaypoint.x - waypoint.x, nextWaypoint.y - waypoint.y);
+        const playerForward = new Point(Math.sin(this.player.rotation), -1 * Math.cos(this.player.rotation));
+        const dot = waypointVector.dot(playerForward);
+        const denom = waypointVector.magnitude() * playerForward.magnitude();
+        const cos = (denom === 0) ? 0 : dot / denom;
 
-        // if (cos < 0) {
-        //     return 0;
-        // }
+        if (cos < Math.SQRT1_2) {
+            return 0;
+        }
 
         const proj = math.getProjectionOnSegment(this.player.position, track.waypoints[waypointIndex], track.waypoints[nextWaypointIndex]);
         const distance = track.distances[waypointIndex] + new Point(proj.x - waypoint.x, proj.y - waypoint.y).magnitude();
         const totalDistance = track.totalDistance;
         const progress = this.player.laps + distance / totalDistance;
+        const progressDiff = progress - this.lastProgress;
 
-        return progress;
+        if (progressDiff < 0) {
+            return 0;
+        }
+
+        this.lastProgress = progress;
+
+        return progressDiff;
     }
 
     done() {

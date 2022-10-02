@@ -92,21 +92,26 @@ class DQN_RAM(nn.Module):
         super(DQN_RAM, self).__init__()
         self.in_features = in_features
         self.num_actions = num_actions
-        self.hidden_size = 4
+        self.hidden_size = 128
 
         self.fc1 = nn.Linear(in_features, self.hidden_size)
         self.act1 = nn.ReLU()
-        self.fc2 = nn.Linear(self.hidden_size, num_actions)
+        self.fc2 = nn.Linear(self.hidden_size, self.hidden_size)
+        self.act2 = nn.ReLU()
+        self.fc3 = nn.Linear(self.hidden_size, num_actions)
 
     def forward(self, x):
         x = self.act1(self.fc1(x))
-        return self.fc2(x)
+        x = self.act2(self.fc2(x))
+        return self.fc3(x)
 
     def to_json(self):
         return [
             layer_to_json(self.fc1, "fc1"),
             layer_to_json(self.act1, "act1"),
             layer_to_json(self.fc2, "fc2"),
+            layer_to_json(self.act2, "act2"),
+            layer_to_json(self.fc3, "fc3"),
         ]
 
 
@@ -185,6 +190,7 @@ def learning(
 
     Q = DQN_RAM(input_arg, num_actions).to(device)
     target_Q = DQN_RAM(input_arg, num_actions).to(device)
+    best_model = DQN_RAM(input_arg, num_actions).to(device)
 
     optimizer = optim.SGD(Q.parameters(), lr=1e-3)
     criterion = nn.MSELoss()
@@ -195,6 +201,7 @@ def learning(
     total_steps = 0
     num_param_updates = 0
     mean_rewards = []
+    best_episode_reward = 0
 
     time_start = time.time()
 
@@ -256,6 +263,10 @@ def learning(
                     if num_param_updates % target_update_freq == 0:
                         target_Q.load_state_dict(Q.state_dict())
 
+        if best_episode_reward < episode_reward:
+            best_episode_reward = episode_reward
+            best_model.load_state_dict(Q.state_dict())
+
         all_episode_rewards.append(episode_reward)
 
         if episode % log_every == 0 and total_steps > learning_starts:
@@ -275,5 +286,12 @@ def learning(
             torch.save(
                 Q.state_dict(), os.path.join(models_path, f"{name}_{episode}.pth")
             )
+
+    if best_model:
+        print(
+            f"Best episode reward: {best_episode_reward}"
+        )
+        name = target_function.__name__.split("_")[0]
+        torch.save(best_model.state_dict(), os.path.join(models_path, f"{name}_best.pth"))
 
     return mean_rewards

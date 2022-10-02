@@ -9,7 +9,7 @@ export class Debug {
         this.debugTrack = new TrackRenderer("#00ff00", this.track.waypoints, 1, "butt")
         this.debugTrackInner = new TrackRenderer("#00ff00", this.track.edgesInner, 1, "butt")
         this.debugTrackOuter = new TrackRenderer("#00ff00", this.track.edgesOuter, 1, "butt")
-        this.modelInputs = this.cars.map(car => new ModelInput(car, 2));
+        this.modelInputs = this.cars.map(car => new ModelInput(car));
     }
 
     draw(context) {

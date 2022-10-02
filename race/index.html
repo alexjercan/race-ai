@@ -31,6 +31,7 @@
         let game;
         let debugMode = false;
         let debug;
+        let reward;
 
         window.onload = init;
 
@@ -46,6 +47,7 @@
             }
 
             debug = new Debug(game);
+            reward = 0;
         });
 
         function init() {
@@ -54,6 +56,8 @@
             game = new WebGame();
 
             debug = new Debug(game);
+
+            reward = 0;
 
             window.requestAnimationFrame(gameLoop);
         }
@@ -68,12 +72,14 @@
             game.update(deltaTime);
             game.draw(context);
 
+            reward += debug.modelInputs[0].reward();
+
             if (debugMode) {
                 debug.draw(context);
 
                 context.font = '25px Arial';
                 context.fillStyle = 'black';
-                context.fillText("FPS: " + fps + " LAPS: " + game.player.laps + " Reward: " + debug.modelInputs[0].reward(), 10, 30);
+                context.fillText("FPS: " + fps + " LAPS: " + game.player.laps + " Reward: " + reward, 10, 30);
             }
 
             window.requestAnimationFrame(gameLoop);

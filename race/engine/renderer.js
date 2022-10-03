@@ -37,6 +37,24 @@ export class PolygonRenderer {
 
 }
 
+export class CircleRenderer {
+    constructor(strokeStyle, center, radius) {
+        this.strokeStyle = strokeStyle;
+        this.center = center;
+        this.radius = radius;
+    }
+
+    draw(context) {
+        context.beginPath();
+        context.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
+
+        context.lineWidth = 1;
+        context.lineCap = "butt";
+        context.strokeStyle = this.strokeStyle;
+        context.stroke();
+    }
+}
+
 export class TrackRenderer {
     constructor(fillStyle, waypoints, width, lineCap="round") {
         this.fillStyle = fillStyle;

@@ -1,8 +1,10 @@
 import { Point } from "./engine/point.js";
 import * as math from "./engine/math.js";
+import { CircleRenderer } from "./engine/renderer.js";
 
 export class ModelInput {
-    constructor(player, rayLength=4) {
+    constructor(player, track, rayLength=4) {
+        this.track = track;
         this.player = player;
         this.rayLength = rayLength;
 
@@ -18,6 +20,78 @@ export class ModelInput {
         ];
 
         this.lastProgress = 0;
+
+        this.nextWaypointIndex = 1;
+        this.laps = 0;
+    }
+
+    update(deltaTime) {
+        const nextWaypoint = this.track.waypoints[this.nextWaypointIndex];
+
+        const outer = this.track.edgesOuter[this.nextWaypointIndex];
+        const inner = this.track.edgesInner[this.nextWaypointIndex];
+        const radius = new Point(outer.x - inner.x, outer.y - inner.y).magnitude() / 2;
+
+        const distance = new Point(
+            nextWaypoint.x - this.player.position.x,
+            nextWaypoint.y - this.player.position.y
+        ).magnitude();
+
+        if (distance <= radius) {
+            this.nextWaypointIndex = (this.nextWaypointIndex + 1) % this.track.waypoints.length;
+            if (this.nextWaypointIndex === 1) {
+                this.laps++;
+            }
+        }
+    }
+
+    draw(context) {
+        const nextWaypoint = this.track.waypoints[this.nextWaypointIndex];
+
+        const outer = this.track.edgesOuter[this.nextWaypointIndex];
+        const inner = this.track.edgesInner[this.nextWaypointIndex];
+        const radius = new Point(outer.x - inner.x, outer.y - inner.y).magnitude() / 2;
+
+        const nextWaypointRenderer = new CircleRenderer("#ffdf00", nextWaypoint, radius);
+        nextWaypointRenderer.draw(context);
+    }
+
+    getClosestPoint() {
+        return this.getClosestPoint(null, null);
+    }
+
+    getClosestPoint(from=null, points=null) {
+        function getDistance(position, point1, point2) {
+            const point = math.getProjectionOnSegment(position, point1, point2);
+
+            return {
+                point,
+                distance: new Point(
+                    point.x - position.x,
+                    point.y - position.y
+                ).magnitude(),
+                start: point1,
+                end: point2,
+            }
+        }
+
+        const position = from ?? this.player.position;
+        const waypoints = points ?? this.track.waypoints;
+        const distances = [];
+
+        for (let i = 0; i < waypoints.length - 1; i++) {
+            const waypoint = waypoints[i];
+            const nextWaypoint = waypoints[i + 1];
+
+            distances.push(getDistance(position, waypoint, nextWaypoint));
+        }
+
+        distances.push(getDistance(position, waypoints[waypoints.length - 1], waypoints[0]));
+
+        const min = Math.min(...distances.map((distance) => distance.distance));
+        const minIndex = distances.map((distance) => distance.distance).indexOf(min);
+
+        return distances[minIndex];
     }
 
     computeLambdaLine(ray, edges) {
@@ -51,7 +125,7 @@ export class ModelInput {
     }
 
     computeLambda(ray) {
-        return Math.min(this.computeLambdaLine(ray, this.player.track.edgesOuter), this.computeLambdaLine(ray, this.player.track.edgesInner));
+        return Math.min(this.computeLambdaLine(ray, this.track.edgesOuter), this.computeLambdaLine(ray, this.track.edgesInner));
     }
 
     observations() {
@@ -63,22 +137,22 @@ export class ModelInput {
             const rayEndY = this.player.position.y + rayEnd.x * Math.sin(this.player.rotation) + rayEnd.y * Math.cos(this.player.rotation);
             const ray = new Point(rayEndX, rayEndY)
 
-            input.push(this.computeLambda(ray, this.player.track.edgesOuter));
+            input.push(this.computeLambda(ray));
         }
 
         return input;
     }
 
     reward() {
-        const distanceFromTrack = this.player.getClosestPoint().distance;
+        const distanceFromTrack = this.getClosestPoint().distance;
+        const track = this.track;
 
-        if (distanceFromTrack > this.player.track.radius) {
+        if (distanceFromTrack > track.radius) {
             return 0;
         }
 
-        const track = this.player.track;
         const n = track.waypoints.length;
-        const nextWaypointIndex = this.player.nextWaypointIndex;
+        const nextWaypointIndex = this.nextWaypointIndex;
         const waypointIndex = ((nextWaypointIndex - 1) % n + n) % n;
 
         const waypoint = track.waypoints[waypointIndex];
@@ -97,7 +171,7 @@ export class ModelInput {
         const proj = math.getProjectionOnSegment(this.player.position, track.waypoints[waypointIndex], track.waypoints[nextWaypointIndex]);
         const distance = track.distances[waypointIndex] + new Point(proj.x - waypoint.x, proj.y - waypoint.y).magnitude();
         const totalDistance = track.totalDistance;
-        const progress = this.player.laps + distance / totalDistance;
+        const progress = this.laps + distance / totalDistance;
         const progressDiff = progress - this.lastProgress;
 
         if (progressDiff < 0) {
@@ -110,7 +184,7 @@ export class ModelInput {
     }
 
     done() {
-        const distanceFromTrack = this.player.getClosestPoint().distance;
+        const distanceFromTrack = this.getClosestPoint().distance;
 
         if (distanceFromTrack > this.player.track.radius) {
             return true;

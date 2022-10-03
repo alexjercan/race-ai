@@ -24,7 +24,9 @@ export class Debug {
         this.debugTrackOuter.draw(context);
 
         const car = this.player;
-        const closestPoint = car.getClosestPoint().point;
+        const modelInput = this.modelInput;
+
+        const closestPoint = modelInput.getClosestPoint().point;
         context.beginPath();
         context.moveTo(car.position.x, car.position.y);
         context.lineTo(closestPoint.x, closestPoint.y);
@@ -32,7 +34,6 @@ export class Debug {
         context.strokeStyle = "#00ff00";
         context.stroke();
 
-        const modelInput = this.modelInput;
         modelInput.rays.forEach((rayEnd) => {
             const rayEndX = rayEnd.x * Math.cos(modelInput.player.rotation) - rayEnd.y * Math.sin(modelInput.player.rotation);
             const rayEndY = rayEnd.x * Math.sin(modelInput.player.rotation) + rayEnd.y * Math.cos(modelInput.player.rotation);
@@ -60,6 +61,6 @@ export class Debug {
 
         context.font = '25px Arial';
         context.fillStyle = 'black';
-        context.fillText("FPS: " + this.fps + " LAPS: " + this.player.laps + " Reward: " + this.game.reward, 10, 30);
+        context.fillText("FPS: " + this.fps + " LAPS: " + this.modelInput.laps + " Reward: " + this.game.reward, 10, 30);
     }
 }

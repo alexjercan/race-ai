@@ -3,14 +3,10 @@ import { Point } from "./engine/point.js";
 import { RectRenderer, PolygonRenderer, TextRenderer } from "./engine/renderer.js";
 
 export class Car {
-    constructor(track) {
+    constructor(position, rotation) {
         //Transform Properties
-        this.position = new Point(track.waypoints[0].x, track.waypoints[0].y);
-        const direction = new Point(
-            track.waypoints[1].x - track.waypoints[0].x,
-            track.waypoints[1].y - track.waypoints[0].y
-        )
-        this.rotation = Math.atan2(direction.x, -1 * direction.y);
+        this.position = position;
+        this.rotation = rotation;
 
         // RigidBody Properties
         this.velocity = new Point(0, 0);
@@ -21,10 +17,6 @@ export class Car {
         this.acceleration = 100;
 
         this.dimensions = new Point(50, 100);
-
-        this.track = track;
-        this.nextWaypointIndex = 1;
-        this.laps = 0;
 
         // Render Properties
         this.renderer = {
@@ -53,19 +45,6 @@ export class Car {
         this.position.y += this.velocity.y * deltaTime;
 
         this.rotation += angleInput * this.turnSpeed * deltaTime;
-
-        const nextWaypoint = this.track.waypoints[this.nextWaypointIndex];
-        const distance = new Point(
-            nextWaypoint.x - this.position.x,
-            nextWaypoint.y - this.position.y
-        ).magnitude();
-
-        if (distance <= this.track.radius) {
-            this.nextWaypointIndex = (this.nextWaypointIndex + 1) % this.track.waypoints.length;
-            if (this.nextWaypointIndex === 1) {
-                this.laps++;
-            }
-        }
     }
 
     draw(context) {
@@ -78,43 +57,5 @@ export class Car {
 
         context.rotate(-1 * this.rotation);
         context.translate(-1 * this.position.x, -1 * this.position.y);
-    }
-
-    getClosestPoint() {
-        return this.getClosestPoint(null, null);
-    }
-
-    getClosestPoint(from=null, points=null) {
-        function getDistance(position, point1, point2) {
-            const point = math.getProjectionOnSegment(position, point1, point2);
-
-            return {
-                point,
-                distance: new Point(
-                    point.x - position.x,
-                    point.y - position.y
-                ).magnitude(),
-                start: point1,
-                end: point2,
-            }
-        }
-
-        const position = from ?? this.position;
-        const waypoints = points ?? this.track.waypoints;
-        const distances = [];
-
-        for (let i = 0; i < waypoints.length - 1; i++) {
-            const waypoint = waypoints[i];
-            const nextWaypoint = waypoints[i + 1];
-
-            distances.push(getDistance(position, waypoint, nextWaypoint));
-        }
-
-        distances.push(getDistance(position, waypoints[waypoints.length - 1], waypoints[0]));
-
-        const min = Math.min(...distances.map((distance) => distance.distance));
-        const minIndex = distances.map((distance) => distance.distance).indexOf(min);
-
-        return distances[minIndex];
     }
 }

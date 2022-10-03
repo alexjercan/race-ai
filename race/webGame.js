@@ -11,10 +11,17 @@ export class WebGame {
     constructor(track_name="simple") {
         this.track = new Track(track_waypoints[track_name]);
 
-        this.player = new Car(this.track);
+        const position = new Point(this.track.waypoints[0].x, this.track.waypoints[0].y);
+        const direction = new Point(
+            this.track.waypoints[1].x - this.track.waypoints[0].x,
+            this.track.waypoints[1].y - this.track.waypoints[0].y
+        )
+        const rotation = Math.atan2(direction.x, -1 * direction.y);
+
+        this.player = new Car(position, rotation);
         this.humanInput = new HumanInput(document);
 
-        this.modelInput = new ModelInput(this.player);
+        this.modelInput = new ModelInput(this.player, this.track);
         const layers = JSON.parse(data_layers);
         this.aiInput = new PredictInput(new Model(layers), this.modelInput);
 
@@ -23,6 +30,8 @@ export class WebGame {
     }
 
     update(deltaTime) {
+        this.modelInput.update(deltaTime);
+
         const input = (this.aiMode) ? this.aiInput.waitInput() : this.humanInput.waitInput();
 
         this.player.move(input[0], input[1], deltaTime);
@@ -33,5 +42,6 @@ export class WebGame {
     draw(context) {
         this.track.draw(context);
         this.player.draw(context);
+        this.modelInput.draw(context);
     }
 }

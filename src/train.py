@@ -28,7 +28,7 @@ if __name__ == "__main__":
         log_every=20,
         models_path=models_path,
     )
-    
+
     env = RaceEnv()
     ddqn_all_rewards, best_model = learning(
         env=env,

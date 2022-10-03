@@ -4,20 +4,30 @@
 
 <head>
     <title>RaceAI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 </head>
 
 <body>
     <div>
-        <div>
-            <div>
-                <input type="checkbox" id="debug" name="settings" value="debug" />
-                <label for="debug">debug</label>
+        <div class="row">
+            <div class="col">
+                <h4>Menu</h4>
             </div>
 
-            <div>
-                <input type="checkbox" id="ai" name="ai" value="ai" />
-                <label for="ai">ai</label>
+            <div class="col">
+                <input type="checkbox" id="debug" name="settings" value="debug" />
+                <label for="debug">Debug Mode</label>
             </div>
+
+            <div class="col">
+                <input type="checkbox" id="ai" name="ai" value="ai" />
+                <label for="ai">AI Mode</label>
+            </div>
+
+            <div class="col">
+                <input type="button" id="reset" name="reset" value="reset" />
+            </div>
+
           </div>
         <br/>
         <canvas id="canvas" width="1000" height="1000"></canvas>
@@ -26,7 +36,6 @@
     <script type="module">
         "use strict";
         import { WebGame } from "./webGame.js";
-        import { ModelGame } from "./modelGame.js";
         import { Debug } from "./debug.js";
         import { track_waypoints } from "./track.js";
 
@@ -34,36 +43,34 @@
         let context;
         let oldTimeStamp = Date.now();
         let game;
-        let debugMode = false;
         let debug;
-        let reward;
-        let track_name = "simple";
+        let debugMode = false;
 
         window.onload = init;
+
+        document.getElementById("reset").addEventListener("click", (event) => {
+            game = new WebGame("simple");
+            debug = new Debug(game);
+            debugMode = false;
+
+            document.getElementById("debug").checked = false;
+            document.getElementById("ai").checked = false;
+        });
 
         document.getElementById("debug").addEventListener("change", (event) => {
             debugMode = event.target.checked;
         });
 
         document.getElementById("ai").addEventListener("change", (event) => {
-            if (event.target.checked) {
-                game = new ModelGame(track_name);
-            } else {
-                game = new WebGame(track_name);
-            }
-
-            debug = new Debug(game);
-            reward = 0;
+            game.aiMode = event.target.checked;
         });
 
         function init() {
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
-            game = new WebGame(track_name);
-
+            game = new WebGame("simple");
             debug = new Debug(game);
-
-            reward = 0;
+            debugMode = false;
 
             window.requestAnimationFrame(gameLoop);
         }
@@ -72,20 +79,14 @@
             const deltaTime = (timeStamp - oldTimeStamp) / 1000;
             oldTimeStamp = timeStamp;
 
-            const fps = Math.round(1 / deltaTime);
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             game.update(deltaTime);
+            debug.update(deltaTime)
+
             game.draw(context);
-
-            reward += debug.modelInputs[0].reward();
-
             if (debugMode) {
                 debug.draw(context);
-
-                context.font = '25px Arial';
-                context.fillStyle = 'black';
-                context.fillText("FPS: " + fps + " LAPS: " + game.player.laps + " Reward: " + reward, 10, 30);
             }
 
             window.requestAnimationFrame(gameLoop);

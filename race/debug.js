@@ -12,10 +12,12 @@ export class Debug {
         this.debugTrackOuter = new TrackRenderer("#00ff00", this.track.edgesOuter, 1, "butt")
 
         this.fps = 0;
+        this.timeElapsed = 0;
     }
 
     update(deltaTime) {
         this.fps = Math.round(1 / deltaTime);
+        this.timeElapsed += deltaTime;
     }
 
     draw(context) {
@@ -63,6 +65,6 @@ export class Debug {
 
         context.font = '25px Arial';
         context.fillStyle = 'black';
-        context.fillText("FPS: " + this.fps + " LAPS: " + this.env.laps + " Reward: " + this.game.reward, 10, 30);
+        context.fillText(`FPS: ${this.fps} Laps: ${this.env.laps} Score: ${this.game.reward.toFixed(2)} Time: ${this.timeElapsed.toFixed(2)}`, 10, 30);
     }
 }

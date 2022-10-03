@@ -47,7 +47,7 @@
 
         let canvas;
         let context;
-        let oldTimeStamp = Date.now();
+        let oldTimeStamp;
         let game;
         let debug;
         let debugMode = false;
@@ -102,6 +102,9 @@
         }
 
         function gameLoop(timeStamp) {
+            if (oldTimeStamp === undefined) {
+                oldTimeStamp = timeStamp;
+            }
             const deltaTime = (timeStamp - oldTimeStamp) / 1000;
             oldTimeStamp = timeStamp;
 

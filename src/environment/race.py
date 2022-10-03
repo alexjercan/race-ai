@@ -17,7 +17,7 @@ class RaceEnv(Env):
         self.path = path
         self.process = None
 
-        self.observation_space = spaces.Box(low=-1.0, high=1.0, shape=(8,))
+        self.observation_space = spaces.Box(low=-1.0, high=1.0, shape=(10,))
 
         self.action_space = spaces.Discrete(9)
 

@@ -58,6 +58,24 @@ export class AgentEnvironment {
             input.push(Math.min(lambdaOuter, lambdaInner));
         }
 
+        input.push(this.player.velocity.magnitude() / this.player.topSpeed);
+
+        const track = this.track;
+
+        const n = track.waypoints.length;
+        const nextWaypointIndex = this.nextWaypointIndex;
+        const waypointIndex = ((nextWaypointIndex - 1) % n + n) % n;
+
+        const waypoint = track.waypoints[waypointIndex];
+        const nextWaypoint = track.waypoints[nextWaypointIndex];
+
+        const waypointVector = new Point(nextWaypoint.x - waypoint.x, nextWaypoint.y - waypoint.y);
+        const playerForward = new Point(Math.sin(this.player.rotation), -1 * Math.cos(this.player.rotation));
+        const dot = waypointVector.dot(playerForward);
+        const denom = waypointVector.magnitude() * playerForward.magnitude();
+        const cos = (denom === 0) ? 0 : dot / denom;
+        input.push(cos);
+
         return input;
     }
 

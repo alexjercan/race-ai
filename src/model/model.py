@@ -192,7 +192,7 @@ def learning(
     target_Q = DQN_RAM(input_arg, num_actions).to(device)
     best_model = DQN_RAM(input_arg, num_actions).to(device)
 
-    optimizer = optim.SGD(Q.parameters(), lr=1e-3)
+    optimizer = optim.Adam(Q.parameters(), lr=1e-3)
     criterion = nn.MSELoss()
     replay_buffer = ReplayBuffer(replay_buffer_size)
     eps_scheduler = iter(eps_generator(0.9, 0.05))
@@ -209,7 +209,7 @@ def learning(
         s = env.reset()
         episode_reward = 0
 
-        for _ in range(60 * 60 * 3):
+        for _ in range(60 * 30):
             total_steps += 1
 
             if total_steps > learning_starts:

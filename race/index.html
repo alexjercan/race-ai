@@ -25,6 +25,12 @@
             </div>
 
             <div class="col">
+                <select name="track" id="track">
+                </select>
+                <label for="track">Select Track</label>
+            </div>
+
+            <div class="col">
                 <input type="button" id="reset" name="reset" value="reset" />
             </div>
 
@@ -48,13 +54,27 @@
 
         window.onload = init;
 
-        document.getElementById("reset").addEventListener("click", (event) => {
-            game = new WebGame("simple");
+        function reset(track_name="simple") {
+            game = new WebGame(track_name);
             debug = new Debug(game);
             debugMode = false;
 
             document.getElementById("debug").checked = false;
             document.getElementById("ai").checked = false;
+
+            const options = Object.keys(track_waypoints).map((track_name) => {
+                const option = document.createElement("option");
+                option.text = track_name;
+                option.value = track_name;
+
+                return option;
+            });
+            document.getElementById("track").innerHTML = "";
+            document.getElementById("track").append(...options);
+        }
+
+        document.getElementById("reset").addEventListener("click", (event) => {
+            reset();
         });
 
         document.getElementById("debug").addEventListener("change", (event) => {
@@ -65,12 +85,18 @@
             game.aiMode = event.target.checked;
         });
 
+        document.getElementById("track").addEventListener("change", (event) => {
+            const track_name = event.target.value;
+            reset(track_name);
+
+            document.getElementById("track").value = track_name;
+        });
+
         function init() {
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
-            game = new WebGame("simple");
-            debug = new Debug(game);
-            debugMode = false;
+
+            reset();
 
             window.requestAnimationFrame(gameLoop);
         }

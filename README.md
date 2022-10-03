@@ -22,7 +22,7 @@ python src/train.py
 
 ## Plan
 
-- [ ] Implement racing game
+- [X] Implement racing game
     - [X] Map generation (Should be a simple map made with waypoints)
     - [X] Implement a car object that can be moved on the canvas
     - [X] Implement Game Objects to make the Car generation and draw easier
@@ -32,7 +32,7 @@ python src/train.py
     - [X] Implement a class that will output data for model input
     - [X] Implement the reward
     - [X] Implement model loading and wait input functions
-    - [ ] Create more tracks
+    - [X] Create more tracks
 - [ ] Implement RL algorithm to play the racing game
     - [X] Implement OpenAI Gym environment that will use subprocess to run the game
     - [X] Implement DQN algorithm to train a simple model

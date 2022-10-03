@@ -3,9 +3,10 @@ import { Car } from "./car.js";
 import { Track, track_waypoints } from "./track.js";
 import { HumanInput } from "./humanInput.js";
 import { PredictInput } from "./predictInput.js";
-import { ModelInput } from "./modelInput.js";
+import { AgentEnvironment } from "./agentEnvironment.js";
 import { data_layers } from "./model.js";
 import { Model } from "./torch/model.js";
+import { CircleRenderer } from "./engine/renderer.js";
 
 export class WebGame {
     constructor(track_name="simple") {
@@ -21,27 +22,38 @@ export class WebGame {
         this.player = new Car(position, rotation);
         this.humanInput = new HumanInput(document);
 
-        this.modelInput = new ModelInput(this.player, this.track);
+        this.env = new AgentEnvironment(this.player, this.track);
         const layers = JSON.parse(data_layers);
-        this.aiInput = new PredictInput(new Model(layers), this.modelInput);
+        this.aiInput = new PredictInput(new Model(layers), this.env);
 
         this.aiMode = false;
         this.reward = 0;
+
+        this.nextWaypointRenderer = new CircleRenderer("#ffdf00", new Point(0, 0), 1);
     }
 
     update(deltaTime) {
-        this.modelInput.update(deltaTime);
-
         const input = (this.aiMode) ? this.aiInput.waitInput() : this.humanInput.waitInput();
 
         this.player.move(input[0], input[1], deltaTime);
 
-        this.reward += this.modelInput.reward();
+        this.env.update(deltaTime);
+
+        this.reward += this.env.reward();
+
+        const nextWaypoint = this.track.waypoints[this.env.nextWaypointIndex];
+
+        const outer = this.track.edgesOuter[this.env.nextWaypointIndex];
+        const inner = this.track.edgesInner[this.env.nextWaypointIndex];
+        const radius = new Point(outer.x - inner.x, outer.y - inner.y).magnitude() / 2;
+
+        this.nextWaypointRenderer.center = nextWaypoint;
+        this.nextWaypointRenderer.radius = radius;
     }
 
     draw(context) {
         this.track.draw(context);
         this.player.draw(context);
-        this.modelInput.draw(context);
+        this.nextWaypointRenderer.draw(context);
     }
 }

@@ -26,12 +26,14 @@ export class Debug {
         const car = this.player;
         const modelInput = this.modelInput;
 
-        const closestPoint = modelInput.getClosestPoint().point;
+        const closest = this.player.position.getClosestPointOnShape(this.track.waypoints);
+        const closestPoint = closest.point;
+        const distanceFromTrack = closest.distance;
         context.beginPath();
         context.moveTo(car.position.x, car.position.y);
         context.lineTo(closestPoint.x, closestPoint.y);
         context.lineWidth = 1;
-        context.strokeStyle = "#00ff00";
+        context.strokeStyle = (distanceFromTrack >= this.track.radius) ? "#ff0000" : "#00ff00";
         context.stroke();
 
         modelInput.rays.forEach((rayEnd) => {

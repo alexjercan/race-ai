@@ -2,19 +2,28 @@ import { Point } from "./engine/point.js";
 import { Car } from "./car.js";
 import { Track, track_waypoints } from "./track.js";
 import { StdinInput } from "./stdinInput.js";
-import { ModelInput } from "./modelInput.js";
+import { AgentEnvironment } from "./agentEnvironment.js";
 
 export class StdinGame {
     constructor(track_name="simple") {
         this.track = new Track(track_waypoints[track_name]);
-        this.player = new Car(this.track);
+
+        const position = new Point(this.track.waypoints[0].x, this.track.waypoints[0].y);
+        const direction = new Point(
+            this.track.waypoints[1].x - this.track.waypoints[0].x,
+            this.track.waypoints[1].y - this.track.waypoints[0].y
+        )
+        const rotation = Math.atan2(direction.x, -1 * direction.y);
+
+        this.player = new Car(position, rotation);
         this.input = new StdinInput();
-        this.modelInput = new ModelInput(this.player);
+
+        this.env = new AgentEnvironment(this.player, this.track);
 
         this.input.output({
-            observations: this.modelInput.observations(),
-            reward: this.modelInput.reward(),
-            done: this.modelInput.done(),
+            observations: this.env.observations(),
+            reward: this.env.reward(),
+            done: this.env.done(),
         });
     }
 
@@ -23,10 +32,12 @@ export class StdinGame {
 
         this.player.move(input[0], input[1], deltaTime);
 
+        this.env.update(deltaTime);
+
         this.input.output({
-            observations: this.modelInput.observations(),
-            reward: this.modelInput.reward(),
-            done: this.modelInput.done(),
+            observations: this.env.observations(),
+            reward: this.env.reward(),
+            done: this.env.done(),
         });
     }
 }

@@ -4,7 +4,7 @@ export class Debug {
     constructor(game) {
         this.game = game;
         this.player = game.player;
-        this.modelInput = game.modelInput;
+        this.env = game.env;
         this.track = game.track;
 
         this.debugTrack = new TrackRenderer("#00ff00", this.track.waypoints, 1, "butt")
@@ -24,7 +24,7 @@ export class Debug {
         this.debugTrackOuter.draw(context);
 
         const car = this.player;
-        const modelInput = this.modelInput;
+        const env = this.env;
 
         const closest = this.player.position.getClosestPointOnShape(this.track.waypoints);
         const closestPoint = closest.point;
@@ -36,26 +36,26 @@ export class Debug {
         context.strokeStyle = (distanceFromTrack >= this.track.radius) ? "#ff0000" : "#00ff00";
         context.stroke();
 
-        modelInput.rays.forEach((rayEnd) => {
-            const rayEndX = rayEnd.x * Math.cos(modelInput.player.rotation) - rayEnd.y * Math.sin(modelInput.player.rotation);
-            const rayEndY = rayEnd.x * Math.sin(modelInput.player.rotation) + rayEnd.y * Math.cos(modelInput.player.rotation);
+        env.rays.forEach((rayEnd) => {
+            const rayEndX = rayEnd.x * Math.cos(env.player.rotation) - rayEnd.y * Math.sin(env.player.rotation);
+            const rayEndY = rayEnd.x * Math.sin(env.player.rotation) + rayEnd.y * Math.cos(env.player.rotation);
 
             context.beginPath();
-            context.moveTo(modelInput.player.position.x, modelInput.player.position.y);
-            context.lineTo(modelInput.player.position.x + rayEndX, modelInput.player.position.y + rayEndY);
+            context.moveTo(env.player.position.x, env.player.position.y);
+            context.lineTo(env.player.position.x + rayEndX, env.player.position.y + rayEndY);
             context.lineWidth = 1;
             context.strokeStyle = "#ff0000";
             context.stroke();
         });
-        const obs = modelInput.observations();
-        modelInput.rays.forEach((rayEnd, index) => {
+        const obs = env.observations();
+        env.rays.forEach((rayEnd, index) => {
 
-            const rayEndX = obs[index] * (rayEnd.x * Math.cos(modelInput.player.rotation) - rayEnd.y * Math.sin(modelInput.player.rotation));
-            const rayEndY = obs[index] * (rayEnd.x * Math.sin(modelInput.player.rotation) + rayEnd.y * Math.cos(modelInput.player.rotation));
+            const rayEndX = obs[index] * (rayEnd.x * Math.cos(env.player.rotation) - rayEnd.y * Math.sin(env.player.rotation));
+            const rayEndY = obs[index] * (rayEnd.x * Math.sin(env.player.rotation) + rayEnd.y * Math.cos(env.player.rotation));
 
             context.beginPath();
-            context.moveTo(modelInput.player.position.x, modelInput.player.position.y);
-            context.lineTo(modelInput.player.position.x + rayEndX, modelInput.player.position.y + rayEndY);
+            context.moveTo(env.player.position.x, env.player.position.y);
+            context.lineTo(env.player.position.x + rayEndX, env.player.position.y + rayEndY);
             context.lineWidth = 1;
             context.strokeStyle = "#00ff00";
             context.stroke();
@@ -63,6 +63,6 @@ export class Debug {
 
         context.font = '25px Arial';
         context.fillStyle = 'black';
-        context.fillText("FPS: " + this.fps + " LAPS: " + this.modelInput.laps + " Reward: " + this.game.reward, 10, 30);
+        context.fillText("FPS: " + this.fps + " LAPS: " + this.env.laps + " Reward: " + this.game.reward, 10, 30);
     }
 }

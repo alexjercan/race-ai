@@ -74,7 +74,8 @@ export class AgentEnvironment {
         const dot = waypointVector.dot(playerForward);
         const denom = waypointVector.magnitude() * playerForward.magnitude();
         const cos = (denom === 0) ? 0 : dot / denom;
-        input.push(cos);
+        const cos01 = (cos + 1) / 2;
+        input.push(cos01);
 
         return input;
     }

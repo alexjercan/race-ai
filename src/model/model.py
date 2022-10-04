@@ -1,16 +1,13 @@
 import os
-import gym
 import time
 import torch
 import datetime
 
 import numpy as np
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 
 from gym import Env
-from itertools import count
 from typing import Union, Tuple, Callable
 from torch import Tensor
 
@@ -115,6 +112,27 @@ class DQN_RAM(nn.Module):
         ]
 
 
+def init_weights(m):
+    if type(m) == nn.Linear:
+        torch.nn.init.xavier_uniform_(m.weight)
+        m.bias.data.fill_(0.01)
+
+
+class HuberLoss(nn.Module):
+    def __init__(self, delta: float = 1.0, reduction: str = "mean"):
+        super(HuberLoss, self).__init__()
+        self.delta = delta
+        self.reduction = reduction
+
+    def forward(self, x: Tensor, y: Tensor) -> Tensor:
+        diff = torch.abs(x - y)
+        loss = torch.where(diff < self.delta, 0.5 * diff ** 2, self.delta * (diff - 0.5 * self.delta))
+        if self.reduction == "mean":
+            return loss.mean()
+        elif self.reduction == "sum":
+            return loss.sum()
+
+
 def eps_generator(max_eps: float = 1.0, min_eps: float = 0.1, max_iter: int = 10000):
     crt_iter = -1
 
@@ -192,10 +210,13 @@ def learning(
     target_Q = DQN_RAM(input_arg, num_actions).to(device)
     best_model = DQN_RAM(input_arg, num_actions).to(device)
 
-    optimizer = optim.Adam(Q.parameters(), lr=1e-3)
-    criterion = nn.MSELoss()
+    Q.apply(init_weights)
+    target_Q.apply(init_weights)
+
+    optimizer = optim.RMSprop(Q.parameters(), lr=0.01, alpha=0.95, eps=0.01)
+    criterion = HuberLoss()
     replay_buffer = ReplayBuffer(replay_buffer_size)
-    eps_scheduler = iter(eps_generator(0.9, 0.05))
+    eps_scheduler = iter(eps_generator(0.9, 0.05, replay_buffer_size))
 
     all_episode_rewards = []
     total_steps = 0

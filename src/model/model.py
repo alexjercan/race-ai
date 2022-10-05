@@ -230,7 +230,7 @@ def learning(
         s = env.reset()
         episode_reward = 0
 
-        for _ in range(60 * 30):
+        for _ in range(60 * 60):
             total_steps += 1
 
             if total_steps > learning_starts:

@@ -36,9 +36,6 @@ export class Track {
             return new Point(p.x + t * r.x, p.y + t * r.y);
         }
 
-        const centerX = this.waypoints.map((point) => point.x).reduce((acc, e) => acc + e, 0) / this.waypoints.length;
-        const centerY = this.waypoints.map((point) => point.y).reduce((acc, e) => acc + e, 0) / this.waypoints.length;
-
         this.edgesInner = []
         this.edgesOuter = []
 
@@ -48,8 +45,6 @@ export class Track {
             const prevWaypoint = this.waypoints[((i - 1) % n + n) % n];
             const waypoint = this.waypoints[i];
             const nextWaypoint = this.waypoints[((i + 1) % n + n) % n];
-
-            const centerVec = new Point(centerX - waypoint.x, centerY - waypoint.y);
 
             const prevVec = new Point(prevWaypoint.x - waypoint.x, prevWaypoint.y - waypoint.y).normalize();
             const nextVec = new Point(waypoint.x - nextWaypoint.x, waypoint.y - nextWaypoint.y).normalize();

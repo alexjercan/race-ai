@@ -21,11 +21,11 @@ if __name__ == "__main__":
         batch_size=128,
         gamma=0.99,
         replay_buffer_size=10000,
-        num_episodes=200,
+        num_episodes=10,
         learning_starts=1000,
         learning_freq=4,
         target_update_freq=100,
-        log_every=20,
+        log_every=1,
         models_path=models_path,
     )
 
@@ -36,11 +36,11 @@ if __name__ == "__main__":
         batch_size=128,
         gamma=0.99,
         replay_buffer_size=10000,
-        num_episodes=200,
+        num_episodes=1000,
         learning_starts=1000,
-        learning_freq=4,
+        learning_freq=8,
         target_update_freq=100,
-        log_every=20,
+        log_every=100,
         models_path=models_path,
     )
     create_model(best_model)

@@ -1,4 +1,5 @@
 import { Point } from "./engine/point.js";
+import { reward } from "./rewardFunction.js";
 
 export class AgentEnvironment {
     constructor(player, track, rayLength=4) {
@@ -84,40 +85,31 @@ export class AgentEnvironment {
         const distanceFromTrack = this.player.position.getClosestPointOnShape(this.track.waypoints).distance;
         const track = this.track;
 
-        if (distanceFromTrack > track.radius) {
-            return 0;
-        }
-
         const n = track.waypoints.length;
         const nextWaypointIndex = this.nextWaypointIndex;
         const waypointIndex = ((nextWaypointIndex - 1) % n + n) % n;
 
         const waypoint = track.waypoints[waypointIndex];
-        const nextWaypoint = track.waypoints[nextWaypointIndex];
-
-        const waypointVector = new Point(nextWaypoint.x - waypoint.x, nextWaypoint.y - waypoint.y);
-        const playerForward = new Point(Math.sin(this.player.rotation), -1 * Math.cos(this.player.rotation));
-        const dot = waypointVector.dot(playerForward);
-        const denom = waypointVector.magnitude() * playerForward.magnitude();
-        const cos = (denom === 0) ? 0 : dot / denom;
-
-        if (cos < Math.SQRT1_2) {
-            return 0;
-        }
 
         const proj = this.player.position.getProjectionOnSegment(track.waypoints[waypointIndex], track.waypoints[nextWaypointIndex]);
         const distance = track.distances[waypointIndex] + new Point(proj.x - waypoint.x, proj.y - waypoint.y).magnitude();
         const totalDistance = track.totalDistance;
         const progress = this.laps + distance / totalDistance;
-        const progressDiff = progress - this.lastProgress;
+        const progressDelta = progress - this.lastProgress;
 
-        if (progressDiff < 0) {
-            return 0;
-        }
+        this.lastProgress = Math.max(progress, this.lastProgress);
 
-        this.lastProgress = progress;
-
-        return progressDiff;
+        return reward({
+            position: this.player.position,
+            rotation: this.player.rotation,
+            waypointIndex,
+            nextWaypointIndex,
+            distanceFromTrack,
+            progressDelta,
+        }, {
+            width: this.track.width,
+            waypoints: this.track.waypoints,
+        });
     }
 
     done() {

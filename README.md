@@ -20,6 +20,33 @@ pip install -r requirements.txt
 python src/train.py
 ```
 
+### Reward Function
+
+To change the default behaviour of the training you can also change the reward function given in [race/rewardFunction.js](race/rewardFunction.js). The reward function receives two arguments, the agent information and the track information.
+The `trackInfo` object will contain the `width` and `waypoints` properties. The `width` is the with of the track (from center to the edge). The waypoints variable is an array of `engine.Point` with the waypoints that make the racing track.
+The `agentInfo` object contains the player's `position` (Point) and `rotation` (number), the waypoint index of the last passed waypoint `waypointIndex` and the index of the waypoint that the player has to reach `nextWaypointIndex`. The `agentInfo` object has some additional helper properties such as `distanceFromTrack` to determine the distance of the car from the center and `progressDelta` to determine the progress made by the player since the last call to the reward function.
+
+#### Arguments
+
+`agentInfo`
+- `position`: `engine.Point` x axis from left to right, y axis from top to bottom
+- `rotation`: `number` in radians
+- `waypointIndex`: `number` \[0, `waypoints.length`\]
+- `nextWaypointIndex`: `number` \(`waypointIndex`+1\)%`waypoints.length`
+- `distanceFromTrack`: `number` \[0, inf\]
+- `progressDelta`: `number` \[-inf, inf\]
+`trackInfo`
+- `width`: `number` constant value, default = 50
+- `waypoints`: `Point[]` constant value, default `track.track_waypoints.simple`
+
+#### Returns 
+
+- `number`
+
+### Torch Hyperparameters
+
+TODO
+
 ## Plan
 
 - [X] Implement racing game

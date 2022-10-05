@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from gym import Env
-from typing import Union, Tuple, Callable
+from typing import Union, Tuple, Dict
 from torch import Tensor
 
 
@@ -118,28 +118,13 @@ def init_weights(m):
         m.bias.data.fill_(0.01)
 
 
-class HuberLoss(nn.Module):
-    def __init__(self, delta: float = 1.0, reduction: str = "mean"):
-        super(HuberLoss, self).__init__()
-        self.delta = delta
-        self.reduction = reduction
-
-    def forward(self, x: Tensor, y: Tensor) -> Tensor:
-        diff = torch.abs(x - y)
-        loss = torch.where(diff < self.delta, 0.5 * diff ** 2, self.delta * (diff - 0.5 * self.delta))
-        if self.reduction == "mean":
-            return loss.mean()
-        elif self.reduction == "sum":
-            return loss.sum()
-
-
-def eps_generator(max_eps: float = 1.0, min_eps: float = 0.1, max_iter: int = 10000):
+def linear_eps_generator(start: float = 1.0, end: float = 0.1, num_steps: int = 10000):
     crt_iter = -1
 
     while True:
         crt_iter += 1
-        frac = min(crt_iter / max_iter, 1)
-        eps = (1 - frac) * max_eps + frac * min_eps
+        frac = min(crt_iter / num_steps, 1)
+        eps = (1 - frac) * start + frac * end
         yield eps
 
 
@@ -188,9 +173,43 @@ def ddqn_target(
     return r_batch + (gamma * next_Q_values)
 
 
+def build_loss(loss_name, loss_kwargs):
+    if loss_name == "huber":
+        return nn.HuberLoss(**loss_kwargs)
+
+    raise ValueError(f"Unknown loss: {loss_name}")
+
+
+def build_optimizer(optimizer_name, optimizer_kwargs, model):
+    if optimizer_name == "rmsprop":
+        return optim.RMSprop(model.parameters(), **optimizer_kwargs)
+
+    raise ValueError(f"Unknown optimizer: {optimizer_name}")
+
+
+def build_epsilon_generator(eps_scheduler_name, eps_scheduler_kwargs):
+    if eps_scheduler_name == "linear":
+        return linear_eps_generator(**eps_scheduler_kwargs)
+
+    raise ValueError(f"Unknown epsilon generator: {eps_scheduler_name}")
+
+
+def build_target_function(target_function_name):
+    if target_function_name == "dqn":
+        return dqn_target
+
+    if target_function_name == "ddqn":
+        return ddqn_target
+
+    raise ValueError(f"Unknown target function: {target_function_name}")
+
+
 def learning(
     env: Env,
-    target_function: Callable,
+    loss_dict: Dict,
+    optimizer_dict: Dict,
+    eps_scheduler_dict: Dict,
+    target_function_dict: Dict,
     batch_size: int = 128,
     gamma: float = 0.99,
     replay_buffer_size=10000,
@@ -213,10 +232,12 @@ def learning(
     Q.apply(init_weights)
     target_Q.apply(init_weights)
 
-    optimizer = optim.RMSprop(Q.parameters(), lr=0.01, alpha=0.95, eps=0.01)
-    criterion = HuberLoss()
+    optimizer = build_optimizer(**optimizer_dict, model=Q)
+    criterion = build_loss(**loss_dict)
     replay_buffer = ReplayBuffer(replay_buffer_size)
-    eps_scheduler = iter(eps_generator(0.9, 0.05, replay_buffer_size))
+    eps_scheduler = iter(build_epsilon_generator(**eps_scheduler_dict))
+
+    target_function = build_target_function(**target_function_dict)
 
     all_episode_rewards = []
     total_steps = 0
@@ -230,7 +251,7 @@ def learning(
         s = env.reset()
         episode_reward = 0
 
-        for _ in range(60 * 60):
+        for _ in range(60 * 30):
             total_steps += 1
 
             if total_steps > learning_starts:
@@ -284,7 +305,7 @@ def learning(
                     if num_param_updates % target_update_freq == 0:
                         target_Q.load_state_dict(Q.state_dict())
 
-        if best_episode_reward < episode_reward:
+        if best_episode_reward < episode_reward and total_steps > learning_starts:
             best_episode_reward = episode_reward
             best_model.load_state_dict(Q.state_dict())
 

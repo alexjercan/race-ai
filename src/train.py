@@ -1,10 +1,12 @@
 import os
+import json
+import argparse
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from environment import RaceEnv
-from model import learning, dqn_target, ddqn_target
+from model import learning
 from pth_to_json import create_model
 
 sns.set()
@@ -14,39 +16,31 @@ os.makedirs(models_path, exist_ok=True)
 
 
 if __name__ == "__main__":
-    env = RaceEnv()
-    dqn_all_rewards, _ = learning(
-        env=env,
-        target_function=dqn_target,
-        batch_size=128,
-        gamma=0.99,
-        replay_buffer_size=10000,
-        num_episodes=10,
-        learning_starts=1000,
-        learning_freq=4,
-        target_update_freq=100,
-        log_every=1,
-        models_path=models_path,
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--config", type=str, dest="config", default="config.json", help="Path to config file")
+
+    args = parser.parse_args()
+
+    with open(args.config, "r") as f:
+        config = json.load(f)
+        learning_kargs = config["learning"]
+        loss = config["loss"]
+        optimizer = config["optimizer"]
+        eps_scheduler = config["eps_scheduler"]
+        target_function = config["target_function"]
 
     env = RaceEnv()
-    ddqn_all_rewards, best_model = learning(
+    all_rewards, best_model = learning(
         env=env,
-        target_function=ddqn_target,
-        batch_size=128,
-        gamma=0.99,
-        replay_buffer_size=10000,
-        num_episodes=1000,
-        learning_starts=1000,
-        learning_freq=8,
-        target_update_freq=100,
-        log_every=100,
-        models_path=models_path,
+        loss_dict=loss,
+        optimizer_dict=optimizer,
+        eps_scheduler_dict=eps_scheduler,
+        target_function_dict=target_function,
+        **learning_kargs
     )
     create_model(best_model)
 
-    plt.plot(dqn_all_rewards, label="dqn")
-    plt.plot(ddqn_all_rewards, label="ddqn")
+    plt.plot(all_rewards)
 
     plt.xlabel(f"Episodes")
     plt.ylabel("Reward")

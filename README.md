@@ -66,3 +66,6 @@ TODO
     - [X] Export model (Maybe to JSON)
     - [X] Implement a game loop that will load the model and use it to generate input
     - [ ] Improve model performance
+- [ ] Make it so that the reward function and config file are easier to edit
+    - [X] Config use arguments to python train script --config
+    - [ ] Create okish folder structure for js scripts and make the reward function more visible

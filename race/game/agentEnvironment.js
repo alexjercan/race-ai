@@ -1,5 +1,5 @@
-import { Point } from "./engine/point.js";
-import { reward } from "./rewardFunction.js";
+import { Point } from "../engine/point.js";
+import { reward } from "../rewardFunction.js";
 
 export class AgentEnvironment {
     constructor(player, track, rayLength=4) {

@@ -1,11 +1,11 @@
 export class PredictInput {
-    constructor(model, modelInput) {
+    constructor(model, env) {
         this.model = model;
-        this.modelInput = modelInput;
+        this.env = env;
     }
 
     waitInput() {
-        const proba = this.model.predict(this.modelInput.observations());
+        const proba = this.model.predict(this.env.observations());
         const action = proba.indexOf(Math.max(...proba));
         return [action % 3 - 1, Math.floor(action / 3) - 1];
     }

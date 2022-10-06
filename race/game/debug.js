@@ -1,4 +1,4 @@
-import { TrackRenderer } from "./engine/renderer.js";
+import { TrackRenderer } from "../engine/renderer.js";
 
 export class Debug {
     constructor(game) {

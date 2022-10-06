@@ -1,4 +1,4 @@
-import { StdinGame } from "./stdinGame.js";
+import { StdinGame } from "./game/stdinGame.js";
 
 async function main() {
     const game = new StdinGame();

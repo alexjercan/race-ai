@@ -1,12 +1,12 @@
-import { Point } from "./engine/point.js";
+import { Point } from "../engine/point.js";
 import { Car } from "./car.js";
 import { Track, track_waypoints } from "./track.js";
-import { HumanInput } from "./humanInput.js";
-import { PredictInput } from "./predictInput.js";
+import { HumanInput } from "./input/humanInput.js";
+import { PredictInput } from "./input/predictInput.js";
 import { AgentEnvironment } from "./agentEnvironment.js";
-import { data_layers } from "./model.js";
-import { Model } from "./torch/model.js";
-import { CircleRenderer } from "./engine/renderer.js";
+import { data_layers } from "../model/model.js";
+import { Model } from "../torch/model.js";
+import { CircleRenderer } from "../engine/renderer.js";
 
 export class WebGame {
     constructor(track_name="simple") {

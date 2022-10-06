@@ -1,5 +1,5 @@
-import { TrackRenderer } from "./engine/renderer.js";
-import { Point } from "./engine/point.js";
+import { TrackRenderer } from "../engine/renderer.js";
+import { Point } from "../engine/point.js";
 
 export const track_waypoints = {
     simple: [new Point(100, 100), new Point(200, 500), new Point(500, 500), new Point(700, 100)],

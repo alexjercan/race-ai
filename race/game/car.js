@@ -1,6 +1,6 @@
-import * as math from "./engine/math.js";
-import { Point } from "./engine/point.js";
-import { RectRenderer, PolygonRenderer } from "./engine/renderer.js";
+import * as math from "../engine/math.js";
+import { Point } from "../engine/point.js";
+import { RectRenderer, PolygonRenderer } from "../engine/renderer.js";
 
 export class Car {
     constructor(position, rotation) {

@@ -1,7 +1,7 @@
-import { Point } from "./engine/point.js";
+import { Point } from "../engine/point.js";
 import { Car } from "./car.js";
 import { Track, track_waypoints } from "./track.js";
-import { StdinInput } from "./stdinInput.js";
+import { StdinInput } from "./input/stdinInput.js";
 import { AgentEnvironment } from "./agentEnvironment.js";
 
 export class StdinGame {

@@ -23,13 +23,14 @@ if __name__ == "__main__":
 
     with open(args.config, "r") as f:
         config = json.load(f)
-        learning_kargs = config["learning"]
-        loss = config["loss"]
-        optimizer = config["optimizer"]
-        eps_scheduler = config["eps_scheduler"]
-        target_function = config["target_function"]
+        learning_kargs = config.get("learning", {})
+        environment = config.get("environment", {})
+        loss = config.get("loss", {})
+        optimizer = config.get("optimizer", {})
+        eps_scheduler = config.get("eps_scheduler", {})
+        target_function = config.get("target_function", {})
 
-    env = RaceEnv()
+    env = RaceEnv(**environment)
     all_rewards, best_model = learning(
         env=env,
         loss_dict=loss,

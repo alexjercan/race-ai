@@ -11,10 +11,11 @@ DONE = "done"
 
 
 class RaceEnv(Env):
-    def __init__(self, path="./race/index.js"):
+    def __init__(self, track_name="simple", path="./race/index.js"):
         super().__init__()
 
         self.path = path
+        self.track_name = track_name
         self.process = None
 
         self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(10,))
@@ -26,7 +27,7 @@ class RaceEnv(Env):
             self.process.kill()
 
         self.process = subprocess.Popen(
-            ["node", self.path],
+            ["node", self.path, self.track_name],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

@@ -6,7 +6,7 @@ from model import DQN_RAM
 from environment import RaceEnv
 
 
-def create_model(model: DQN_RAM, js_path="race/model.js"):
+def create_model(model: DQN_RAM, js_path="race/model/model.js"):
     json_model = model.to_json()
 
     model_file_tempalte = """export const data_layers = '%s';"""
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--js",
         type=str,
-        default="race/model.js",
+        default="race/model/model.js",
         dest="js",
         help="Path to the model.js file",
     )

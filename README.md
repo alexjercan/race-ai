@@ -2,6 +2,8 @@
 
 ## Quickstart
 
+Check the deployed version at [https://alexjercan.github.io/race-ai/race/index.html](https://alexjercan.github.io/race-ai/race/index.html)
+
 To be able to play around with the manual car you can start a http server in
 the race directory and open the browser at `localhost:8000`.
 
@@ -45,6 +47,8 @@ The `agentInfo` object contains the player's `position` (Point) and `rotation` (
 - `number`
 
 ### Torch Hyperparameters
+
+To change the hyperparameters you can edit the [config.json](config.json) file with the following keys:
 
 `learning`:
 - `batch_size`: the number of samples to extract from the replay buffer, default=`128`

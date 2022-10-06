@@ -67,4 +67,10 @@ export class Debug {
         context.fillStyle = 'black';
         context.fillText(`FPS: ${this.fps} Laps: ${this.env.laps} Score: ${this.game.reward.toFixed(2)} Time: ${this.timeElapsed.toFixed(2)}`, 10, 30);
     }
+
+    draw_minimal(context) {
+        context.font = '25px Arial';
+        context.fillStyle = 'black';
+        context.fillText(`Laps: ${this.env.laps} Time: ${this.timeElapsed.toFixed(2)}`, 10, 30);
+    }
 }

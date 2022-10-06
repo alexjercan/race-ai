@@ -116,6 +116,8 @@
             game.draw(context);
             if (debugMode) {
                 debug.draw(context);
+            } else {
+                debug.draw_minimal(context);
             }
 
             window.requestAnimationFrame(gameLoop);

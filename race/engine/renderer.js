@@ -10,6 +10,11 @@ export class RectRenderer {
     draw(context) {
         context.translate(-1 * this.width / 2, -1 * this.height / 2);
 
+        context.lineWidth = 1;
+        context.lineCap = "butt";
+        context.strokeStyle = "black";
+        context.strokeRect(this.x, this.y, this.width, this.height);
+
         context.fillStyle = this.fillStyle;
         context.fillRect(this.x, this.y, this.width, this.height);
 
@@ -30,6 +35,11 @@ export class PolygonRenderer {
             context.lineTo(this.points[i].x, this.points[i].y);
         }
         context.closePath();
+
+        context.lineWidth = 1;
+        context.lineCap = "butt";
+        context.strokeStyle = "black";
+        context.stroke();
 
         context.fillStyle=this.fillStyle;
         context.fill();

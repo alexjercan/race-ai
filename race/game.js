@@ -7,8 +7,6 @@ export class Game {
 
     update(deltaTime) {
         const input = this.input.waitInput();
-
-        console.log(input);
     }
 
     draw(context) {

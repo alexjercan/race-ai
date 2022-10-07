@@ -11,10 +11,12 @@ export class HumanInput {
         this.keyMap = keyMap;
 
         document.addEventListener("keydown", (event) => {
+            console.log(`Key pressed ${event.key}`);
             this.map[event.key] = true;
         });
 
         document.addEventListener("keyup", (event) => {
+            console.log(`Key released ${event.key}`);
             this.map[event.key] = false;
         });
     }

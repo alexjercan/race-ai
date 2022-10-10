@@ -309,6 +309,11 @@ def learning(
             best_episode_reward = episode_reward
             best_model.load_state_dict(Q.state_dict())
 
+            name = target_function.__name__.split("_")[0]
+            torch.save(
+                Q.state_dict(), os.path.join(models_path, f"{name}_{episode}.pth")
+            )
+
         all_episode_rewards.append(episode_reward)
 
         if episode % log_every == 0 and total_steps > learning_starts:
@@ -323,11 +328,6 @@ def learning(
                 f"Episode: {episode}, Mean reward: {mean_episode_reward:.2f}, Best reward: {best_episode_reward:.2f}, Eps: {eps:.2f}, Time: {time_elapsed_str}, Remaining: {time_remaining_str}"
             )
             mean_rewards.append(mean_episode_reward)
-
-            name = target_function.__name__.split("_")[0]
-            torch.save(
-                Q.state_dict(), os.path.join(models_path, f"{name}_{episode}.pth")
-            )
 
     print(f"Best episode reward: {best_episode_reward}")
     name = target_function.__name__.split("_")[0]

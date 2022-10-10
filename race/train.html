@@ -127,7 +127,7 @@
             const text = (game.aiMode) ? `${data_layers[current_model - 1]["name"]}` : `Human Player`;
             context.fillText(text, 500, 30);
 
-            if ((debug.timeElapsed >= 30 || game.env.done()) && current_model > 0) {
+            if ((debug.timeElapsed >= 10 || game.env.done()) && current_model > 0) {
                 step();
             }
 

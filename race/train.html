@@ -16,19 +16,13 @@
             </div>
 
             <div class="col">
-                <input type="checkbox" id="debug" name="settings" value="debug" />
-                <label for="debug">Debug Mode</label>
-            </div>
-
-            <div class="col">
-                <input type="checkbox" id="ai" name="ai" value="ai" />
-                <label for="ai">AI Mode</label>
-            </div>
-
-            <div class="col">
                 <select name="track" id="track">
                 </select>
                 <label for="track">Select Track</label>
+            </div>
+
+            <div class="col">
+                <input type="button" id="start" name="start" value="start" />
             </div>
 
             <div class="col">
@@ -45,24 +39,22 @@
         import { WebGame } from "./game/webGame.js";
         import { Debug } from "./game/debug.js";
         import { track_waypoints } from "./game/track.js";
-        import { data_layers } from "./model/model.js";
+        import { data_layers } from "./model/train.js";
 
         let canvas;
         let context;
         let oldTimeStamp;
         let game;
         let debug;
-        let debugMode = false;
+        let current_model;
 
         window.onload = init;
 
         function reset(track_name="simple") {
-            game = new WebGame(track_name, data_layers);
-            debug = new Debug(game);
-            debugMode = false;
+            current_model = 0;
 
-            document.getElementById("debug").checked = false;
-            document.getElementById("ai").checked = false;
+            game = new WebGame(track_name, "[]");
+            debug = new Debug(game);
 
             const options = Object.keys(track_waypoints).map((track_name) => {
                 const option = document.createElement("option");
@@ -75,16 +67,28 @@
             document.getElementById("track").append(...options);
         }
 
+        function step() {
+            if (current_model >= data_layers.length) {
+                current_model = 0;
+
+                game = new WebGame(game.track_name, "[]");
+                debug = new Debug(game);
+                return;
+            }
+
+            game = new WebGame(game.track_name, data_layers[current_model]["layers"]);
+            debug = new Debug(game);
+
+            game.aiMode = true;
+            current_model += 1;
+        }
+
+        document.getElementById("start").addEventListener("click", (event) => {
+            step();
+        });
+
         document.getElementById("reset").addEventListener("click", (event) => {
             reset();
-        });
-
-        document.getElementById("debug").addEventListener("change", (event) => {
-            debugMode = event.target.checked;
-        });
-
-        document.getElementById("ai").addEventListener("change", (event) => {
-            game.aiMode = event.target.checked;
         });
 
         document.getElementById("track").addEventListener("change", (event) => {
@@ -116,10 +120,10 @@
             debug.update(deltaTime)
 
             game.draw(context);
-            if (debugMode) {
-                debug.draw(context);
-            } else {
-                debug.draw_minimal(context);
+            debug.draw(context);
+
+            if ((debug.timeElapsed >= 30 || game.env.done()) && current_model > 0) {
+                step();
             }
 
             window.requestAnimationFrame(gameLoop);
@@ -128,3 +132,4 @@
 </body>
 
 </html>
+

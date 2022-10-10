@@ -4,12 +4,12 @@ import { Track, track_waypoints } from "./track.js";
 import { HumanInput } from "./input/humanInput.js";
 import { PredictInput } from "./input/predictInput.js";
 import { AgentEnvironment } from "./agentEnvironment.js";
-import { data_layers } from "../model/model.js";
 import { Model } from "../torch/model.js";
 import { CircleRenderer } from "../engine/renderer.js";
 
 export class WebGame {
-    constructor(track_name="simple") {
+    constructor(track_name, data_layers) {
+        this.track_name = track_name;
         this.track = new Track(track_waypoints[track_name]);
 
         const position = new Point(this.track.waypoints[0].x, this.track.waypoints[0].y);

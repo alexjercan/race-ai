@@ -24,7 +24,7 @@ def create_model(model: DQN_RAM, js_path="race/model/model.js"):
 
 
 def dump_models(js_path="race/model/train.js"):
-    paths = sorted(glob.glob("models/*.pth"))
+    paths = sorted(glob.glob("models/*_[0-9]*.pth"), key=lambda x: int(Path(x).stem.split("_")[-1]))
 
     env = RaceEnv()
     model = DQN_RAM(env.observation_space.shape[0], env.action_space.n)
